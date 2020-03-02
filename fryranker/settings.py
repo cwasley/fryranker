@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'fryranker.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fryranked',
+        'NAME': 'fryranker',
         'USER': 'admin',
         'PASSWORD': '',
         'HOST': 'localhost',
