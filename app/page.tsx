@@ -3,14 +3,28 @@
 import { useState, useEffect, useCallback } from 'react'
 import './styles.css'
 
-interface Fry {
+// Local fry metadata (emoji, tags, notes - doesn't change)
+interface FryMeta {
+  id: number
+  name: string
+  style: string
+  emoji: string
+  tags: string[]
+  note: string
+}
+
+// Global fry data from database
+interface GlobalFry {
   id: number
   name: string
   style: string
   score: number
-  emoji: string
-  tags: string[]
-  note: string
+  battles: number
+}
+
+// Combined fry for display
+interface Fry extends FryMeta {
+  score: number
   battles: number
 }
 
@@ -22,97 +36,103 @@ interface TasteEntry {
   comps: number
 }
 
-const initialFries: Fry[] = [
-  { id: 0, name: "McDonald's", style: "Shoestring", score: 1500, emoji: "🍟",
+// Static metadata for each fry
+const fryMeta: FryMeta[] = [
+  { id: 0, name: "McDonald's", style: "Shoestring", emoji: "🍟",
     tags: ["Thin + snappy", "Salt-forward", "Dip-friendly", "Classic"],
-    note: "Iconic shoestrings: quick crunch, fast melt, pure salt-and-potato simplicity.",
-    battles: 0 },
-  { id: 1, name: "Five Guys", style: "Boardwalk", score: 1450, emoji: "🥜",
+    note: "Iconic shoestrings: quick crunch, fast melt, pure salt-and-potato simplicity." },
+  { id: 1, name: "Five Guys", style: "Boardwalk", emoji: "🥜",
     tags: ["Thick cut", "Peanut oil", "Soft center", "Best fresh"],
-    note: "Hand-cut heft with a soft interior; peanut oil aroma does a lot of the heavy lifting.",
-    battles: 0 },
-  { id: 2, name: "Chick-fil-A", style: "Waffle", score: 1400, emoji: "🧇",
+    note: "Hand-cut heft with a soft interior; peanut oil aroma does a lot of the heavy lifting." },
+  { id: 2, name: "Chick-fil-A", style: "Waffle", emoji: "🧇",
     tags: ["Waffle pockets", "Crisp edges", "Sauce sponge", "Balanced salt"],
-    note: "Waffles = texture + maximum sauce capacity. Peak performance with dipping.",
-    battles: 0 },
-  { id: 3, name: "Shake Shack", style: "Crinkle Cut", score: 1350, emoji: "🍔",
+    note: "Waffles = texture + maximum sauce capacity. Peak performance with dipping." },
+  { id: 3, name: "Shake Shack", style: "Crinkle Cut", emoji: "🍔",
     tags: ["Crinkle ridges", "Crispy shell", "Soft middle", "Sauce-ready"],
-    note: "Crinkle geometry brings crunch and grip. Feels engineered (in a good way).",
-    battles: 0 },
-  { id: 4, name: "Popeyes", style: "Cajun Fries", score: 1300, emoji: "🍗",
+    note: "Crinkle geometry brings crunch and grip. Feels engineered (in a good way)." },
+  { id: 4, name: "Popeyes", style: "Cajun Fries", emoji: "🍗",
     tags: ["Cajun spice", "Peppery heat", "Crunchy edges", "Bold seasoning"],
-    note: "Spice-first fries that play well with a creamy dip. Loud in the best way.",
-    battles: 0 },
-  { id: 5, name: "Arby's", style: "Curly", score: 1250, emoji: "🌀",
+    note: "Spice-first fries that play well with a creamy dip. Loud in the best way." },
+  { id: 5, name: "Arby's", style: "Curly", emoji: "🌀",
     tags: ["Curly chaos", "Seasoned", "Textural mix", "Snackable"],
-    note: "Curly fries are a rollercoaster: crunchy bits, soft coils, constant surprises.",
-    battles: 0 },
-  { id: 6, name: "Wendy's", style: "Natural Cut", score: 1200, emoji: "🥤",
+    note: "Curly fries are a rollercoaster: crunchy bits, soft coils, constant surprises." },
+  { id: 6, name: "Wendy's", style: "Natural Cut", emoji: "🥤",
     tags: ["Skin-on", "Sturdy", "Salt + pepper", "Reliable"],
-    note: "Skin-on sturdiness. Not always the crispiest, but it holds up.",
-    battles: 0 },
-  { id: 7, name: "Wingstop", style: "Seasoned", score: 1150, emoji: "🪽",
+    note: "Skin-on sturdiness. Not always the crispiest, but it holds up." },
+  { id: 7, name: "Wingstop", style: "Seasoned", emoji: "🪽",
     tags: ["Seasoned dust", "Crisp edges", "Savory", "Snack mode"],
-    note: "That seasoned dust is the point. Crisp edges + savory hit = addictive.",
-    battles: 0 },
-  { id: 8, name: "In-N-Out", style: "Fresh Cut", score: 1000, emoji: "🌴",
+    note: "That seasoned dust is the point. Crisp edges + savory hit = addictive." },
+  { id: 8, name: "In-N-Out", style: "Fresh Cut", emoji: "🌴",
     tags: ["Fresh potato", "Soft bite", "Light salt", "Best animal-style"],
-    note: "Fresh cut and simple. If you're judging strictly on crispiness, it's polarizing.",
-    battles: 0 },
-  { id: 9, name: "Burger King", style: "Thick Cut", score: 1400, emoji: "👑",
+    note: "Fresh cut and simple. If you're judging strictly on crispiness, it's polarizing." },
+  { id: 9, name: "Burger King", style: "Thick Cut", emoji: "👑",
     tags: ["Thick cut", "Soft center", "Lightly crisp", "Classic fast-food"],
-    note: "Hefty and straightforward—more potato-forward than crunchy.",
-    battles: 0 },
-  { id: 10, name: "KFC", style: "Seasoned Wedge", score: 1300, emoji: "🍗",
+    note: "Hefty and straightforward—more potato-forward than crunchy." },
+  { id: 10, name: "KFC", style: "Seasoned Wedge", emoji: "🍗",
     tags: ["Wedge cut", "Peppery", "Hearty", "Needs sauce"],
-    note: "Wedges are built like side dishes. Best when dunked.",
-    battles: 0 },
-  { id: 11, name: "Checkers/Rally's", style: "Famous Seasoned", score: 1250, emoji: "🚦",
+    note: "Wedges are built like side dishes. Best when dunked." },
+  { id: 11, name: "Checkers/Rally's", style: "Famous Seasoned", emoji: "🚦",
     tags: ["Max seasoning", "Crisp shell", "Garlic notes", "Late-night hero"],
-    note: "Aggressively seasoned. The 'how is this so good?' drive-thru classic.",
-    battles: 0 },
-  { id: 12, name: "Steak 'n Shake", style: "Shoestring", score: 1150, emoji: "🥛",
+    note: "Aggressively seasoned. The 'how is this so good?' drive-thru classic." },
+  { id: 12, name: "Steak 'n Shake", style: "Shoestring", emoji: "🥛",
     tags: ["Ultra thin", "Crispy", "Salty", "Snackable"],
-    note: "Thin and crispy—feels like a fry that wants to be eaten by the handful.",
-    battles: 0 },
-  { id: 13, name: "Culver's", style: "Crinkle Cut", score: 1100, emoji: "🐄",
+    note: "Thin and crispy—feels like a fry that wants to be eaten by the handful." },
+  { id: 13, name: "Culver's", style: "Crinkle Cut", emoji: "🐄",
     tags: ["Crinkle", "Buttery vibe", "Soft middle", "Comfort"],
-    note: "Comfort crinkles. Plush texture; great with a rich burger.",
-    battles: 0 },
-  { id: 14, name: "Taco Bell", style: "Nacho Fries", score: 1200, emoji: "🌮",
+    note: "Comfort crinkles. Plush texture; great with a rich burger." },
+  { id: 14, name: "Taco Bell", style: "Nacho Fries", emoji: "🌮",
     tags: ["Nacho spice", "Warm cumin", "Dip-required", "Limited-time hype"],
-    note: "Seasoning-forward with a signature nacho vibe. Built for cheese sauce.",
-    battles: 0 },
-  { id: 15, name: "Jack in the Box", style: "Classic", score: 1125, emoji: "🃏",
+    note: "Seasoning-forward with a signature nacho vibe. Built for cheese sauce." },
+  { id: 15, name: "Jack in the Box", style: "Classic", emoji: "🃏",
     tags: ["Medium cut", "Light crisp", "Neutral salt", "Reliable"],
-    note: "A classic middle-of-the-road fry that can surprise you when it's fresh.",
-    battles: 0 },
-  { id: 16, name: "Del Taco", style: "Crinkle Cut", score: 1100, emoji: "🌯",
+    note: "A classic middle-of-the-road fry that can surprise you when it's fresh." },
+  { id: 16, name: "Del Taco", style: "Crinkle Cut", emoji: "🌯",
     tags: ["Crinkle", "Crisp edges", "Salt-forward", "Hot-sauce friendly"],
-    note: "Crinkles with fast-food swagger. Hot sauce compatibility is elite.",
-    battles: 0 },
-  { id: 17, name: "Sonic", style: "Tots", score: 1180, emoji: "🛼",
+    note: "Crinkles with fast-food swagger. Hot sauce compatibility is elite." },
+  { id: 17, name: "Sonic", style: "Tots", emoji: "🛼",
     tags: ["Tater tots", "Crispy outside", "Fluffy inside", "Cheese-ready"],
-    note: "Not a fry, but it belongs here. Peak with chili + cheese.",
-    battles: 0 },
-  { id: 18, name: "White Castle", style: "Crinkle Cut", score: 1075, emoji: "🏰",
+    note: "Not a fry, but it belongs here. Peak with chili + cheese." },
+  { id: 18, name: "White Castle", style: "Crinkle Cut", emoji: "🏰",
     tags: ["Crinkle", "Soft middle", "Snackable", "Slider companion"],
-    note: "Crinkles made for tiny burgers. Hits different at 1 a.m.",
-    battles: 0 }
+    note: "Crinkles made for tiny burgers. Hits different at 1 a.m." }
 ]
 
 const REVEAL_AT = 18
 const LOCKED_TOTAL = 36
 
+const STORAGE_KEYS = {
+  taste: 'fryranker_taste',
+  comparisons: 'fryranker_comparisons'
+}
+
+// Merge global DB data with local metadata
+function mergeFries(globalFries: GlobalFry[]): Fry[] {
+  return globalFries.map(gf => {
+    const meta = fryMeta.find(m => m.id === gf.id)
+    return {
+      id: gf.id,
+      name: gf.name,
+      style: gf.style,
+      score: gf.score,
+      battles: gf.battles,
+      emoji: meta?.emoji || "🍟",
+      tags: meta?.tags || [],
+      note: meta?.note || ""
+    }
+  })
+}
+
 export default function FryRanker() {
-  const [fries, setFries] = useState<Fry[]>(initialFries)
+  const [fries, setFries] = useState<Fry[]>([])
   const [taste, setTaste] = useState<TasteEntry[]>(() => 
-    initialFries.map(f => ({ id: f.id, score: 1500, wins: 0, losses: 0, comps: 0 }))
+    fryMeta.map(f => ({ id: f.id, score: 1500, wins: 0, losses: 0, comps: 0 }))
   )
   const [comparisons, setComparisons] = useState(0)
   const [currentPair, setCurrentPair] = useState<[Fry, Fry] | null>(null)
   const [activeVote, setActiveVote] = useState<number | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [isHydrated, setIsHydrated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [modalContent, setModalContent] = useState<{
     emoji: string
     title: string
@@ -122,11 +142,79 @@ export default function FryRanker() {
     actionsType: 'fry' | 'taste' | 'locked'
   } | null>(null)
 
+  // Fetch global leaderboard from database
+  const fetchLeaderboard = useCallback(async () => {
+    try {
+      const res = await fetch('/api/leaderboard')
+      if (res.ok) {
+        const data = await res.json()
+        const merged = mergeFries(data.fries)
+        setFries(merged)
+      } else {
+        // API returned error - use fallback
+        console.warn('Leaderboard API returned error, using local fallback')
+        setFries(fryMeta.map(m => ({ ...m, score: 1500, battles: 0 })))
+      }
+    } catch (error) {
+      console.error('Failed to fetch leaderboard:', error)
+      // Fallback to local data with default scores
+      setFries(fryMeta.map(m => ({ ...m, score: 1500, battles: 0 })))
+    }
+    setIsLoading(false)
+  }, [])
+
+  // Load personal taste from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedTaste = localStorage.getItem(STORAGE_KEYS.taste)
+      const savedComparisons = localStorage.getItem(STORAGE_KEYS.comparisons)
+
+      if (savedTaste) {
+        const parsed = JSON.parse(savedTaste) as TasteEntry[]
+        const merged = fryMeta.map(f => {
+          const saved = parsed.find(p => p.id === f.id)
+          return saved || { id: f.id, score: 1500, wins: 0, losses: 0, comps: 0 }
+        })
+        setTaste(merged)
+      }
+
+      if (savedComparisons) {
+        setComparisons(parseInt(savedComparisons, 10) || 0)
+      }
+    } catch (e) {
+      console.warn('Failed to load from localStorage:', e)
+    }
+    setIsHydrated(true)
+    fetchLeaderboard()
+  }, [fetchLeaderboard])
+
+  // Save taste to localStorage whenever it changes
+  useEffect(() => {
+    if (!isHydrated) return
+    try {
+      localStorage.setItem(STORAGE_KEYS.taste, JSON.stringify(taste))
+    } catch (e) {
+      console.warn('Failed to save taste to localStorage:', e)
+    }
+  }, [taste, isHydrated])
+
+  // Save comparisons to localStorage whenever it changes
+  useEffect(() => {
+    if (!isHydrated) return
+    try {
+      localStorage.setItem(STORAGE_KEYS.comparisons, comparisons.toString())
+    } catch (e) {
+      console.warn('Failed to save comparisons to localStorage:', e)
+    }
+  }, [comparisons, isHydrated])
+
   const clamp = (n: number, a: number, b: number) => Math.max(a, Math.min(b, n))
   const getFry = (id: number) => fries.find(f => f.id === id)
+  const getFryMeta = (id: number) => fryMeta.find(f => f.id === id)
   const getTaste = (id: number) => taste.find(t => t.id === id)
 
   const pickNewDuel = useCallback(() => {
+    if (fries.length < 2) return
     const idx1 = Math.floor(Math.random() * fries.length)
     let idx2 = Math.floor(Math.random() * fries.length)
     while (idx1 === idx2) idx2 = Math.floor(Math.random() * fries.length)
@@ -134,9 +222,12 @@ export default function FryRanker() {
     setActiveVote(null)
   }, [fries])
 
+  // Pick initial duel once data is loaded
   useEffect(() => {
-    pickNewDuel()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (isHydrated && !isLoading && fries.length > 0 && !currentPair) {
+      pickNewDuel()
+    }
+  }, [isHydrated, isLoading, fries, currentPair, pickNewDuel])
 
   const tasteConfidencePct = () => {
     const pct = clamp(18 + (Math.log10(comparisons + 1) * 52), 18, 100)
@@ -149,7 +240,7 @@ export default function FryRanker() {
   }
 
   const getTopTagFromTopN = (n = 3) => {
-    const topN = [...taste].sort((a, b) => b.score - a.score).slice(0, n).map(t => getFry(t.id)).filter(Boolean) as Fry[]
+    const topN = [...taste].sort((a, b) => b.score - a.score).slice(0, n).map(t => getFryMeta(t.id)).filter(Boolean) as FryMeta[]
     const tagCounts = new Map<string, number>()
     topN.forEach(f => (f.tags || []).forEach(tag => tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)))
     let topTag = "", best = 0
@@ -168,14 +259,14 @@ export default function FryRanker() {
     }
 
     const top = topTaste()
-    const fry = getFry(top.id)
-    if (!fry) return { headline: "Warming up…", sub: "Your favorites will sharpen as you vote.", emoji: "🍟" }
+    const meta = getFryMeta(top.id)
+    if (!meta) return { headline: "Warming up…", sub: "Your favorites will sharpen as you vote.", emoji: "🍟" }
 
     const topTag = getTopTagFromTopN(3)
-    const headline = comparisons < 18 ? `Leaning: ${fry.name}` : `Your #1 right now: ${fry.name}`
+    const headline = comparisons < 18 ? `Leaning: ${meta.name}` : `Your #1 right now: ${meta.name}`
     const sub = comparisons < 18 ? `Keep voting to confirm it.` : (topTag ? `You seem to love: ${topTag}.` : `Keep going to refine your style.`)
 
-    return { headline, sub, emoji: fry.emoji || "🍟" }
+    return { headline, sub, emoji: meta.emoji || "🍟" }
   }
 
   const getConfidenceHint = () => {
@@ -186,53 +277,69 @@ export default function FryRanker() {
     return "Vote a few times to start dialing in your personal #1."
   }
 
-  const vote = (winnerIndex: number) => {
+  const vote = async (winnerIndex: number) => {
     if (!currentPair) return
     setActiveVote(winnerIndex)
 
+    const winner = currentPair[winnerIndex]
+    const loser = currentPair[winnerIndex === 0 ? 1 : 0]
+
+    // Update personal taste locally
+    setTaste(prev => {
+      const newTaste = [...prev]
+      const w = newTaste.find(t => t.id === winner.id)!
+      const l = newTaste.find(t => t.id === loser.id)!
+
+      const K = 28
+      const expectedW = 1 / (1 + Math.pow(10, (l.score - w.score) / 400))
+      const expectedL = 1 / (1 + Math.pow(10, (w.score - l.score) / 400))
+
+      w.score = Math.round(w.score + K * (1 - expectedW))
+      l.score = Math.round(l.score + K * (0 - expectedL))
+      w.wins += 1
+      l.losses += 1
+      w.comps += 1
+      l.comps += 1
+
+      return newTaste
+    })
+    setComparisons(c => c + 1)
+
+    // Send vote to server for global leaderboard
+    try {
+      const res = await fetch('/api/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ winnerId: winner.id, loserId: loser.id })
+      })
+      
+      if (res.ok) {
+        const data = await res.json()
+        const merged = mergeFries(data.fries)
+        setFries(merged)
+      } else {
+        // API failed - update local state only
+        setFries(prev => {
+          const newFries = [...prev]
+          const winnerFry = newFries.find(f => f.id === winner.id)
+          const loserFry = newFries.find(f => f.id === loser.id)
+          if (winnerFry && loserFry) {
+            const K = 32
+            const expectedWinner = 1 / (1 + Math.pow(10, (loserFry.score - winnerFry.score) / 400))
+            const expectedLoser = 1 / (1 + Math.pow(10, (winnerFry.score - loserFry.score) / 400))
+            winnerFry.score = Math.round(winnerFry.score + K * (1 - expectedWinner))
+            loserFry.score = Math.round(loserFry.score + K * (0 - expectedLoser))
+            winnerFry.battles += 1
+            loserFry.battles += 1
+          }
+          return newFries
+        })
+      }
+    } catch (error) {
+      console.error('Failed to record vote:', error)
+    }
+
     setTimeout(() => {
-      const winner = currentPair[winnerIndex]
-      const loser = currentPair[winnerIndex === 0 ? 1 : 0]
-
-      // Update global ELO
-      setFries(prev => {
-        const newFries = [...prev]
-        const winnerFry = newFries.find(f => f.id === winner.id)!
-        const loserFry = newFries.find(f => f.id === loser.id)!
-
-        const K = 32
-        const expectedWinner = 1 / (1 + Math.pow(10, (loserFry.score - winnerFry.score) / 400))
-        const expectedLoser = 1 / (1 + Math.pow(10, (winnerFry.score - loserFry.score) / 400))
-
-        winnerFry.score = Math.round(winnerFry.score + K * (1 - expectedWinner))
-        loserFry.score = Math.round(loserFry.score + K * (0 - expectedLoser))
-        winnerFry.battles += 1
-        loserFry.battles += 1
-
-        return newFries
-      })
-
-      // Update taste ELO
-      setTaste(prev => {
-        const newTaste = [...prev]
-        const w = newTaste.find(t => t.id === winner.id)!
-        const l = newTaste.find(t => t.id === loser.id)!
-
-        const K = 28
-        const expectedW = 1 / (1 + Math.pow(10, (l.score - w.score) / 400))
-        const expectedL = 1 / (1 + Math.pow(10, (w.score - l.score) / 400))
-
-        w.score = Math.round(w.score + K * (1 - expectedW))
-        l.score = Math.round(l.score + K * (0 - expectedL))
-        w.wins += 1
-        l.losses += 1
-        w.comps += 1
-        l.comps += 1
-
-        return newTaste
-      })
-
-      setComparisons(c => c + 1)
       pickNewDuel()
     }, 100)
   }
@@ -262,8 +369,8 @@ export default function FryRanker() {
 
     const styleCounts = new Map<string, number>()
     top5.forEach(t => {
-      const fry = getFry(t.id)
-      const bucket = styleBucket(fry?.style || "")
+      const meta = getFryMeta(t.id)
+      const bucket = styleBucket(meta?.style || "")
       styleCounts.set(bucket, (styleCounts.get(bucket) || 0) + 1)
     })
     let topStyle = "Mixed bag", topStyleCount = 0
@@ -271,7 +378,7 @@ export default function FryRanker() {
       if (v > topStyleCount) { topStyle = k; topStyleCount = v }
     })
 
-    const topFries = top5.map(t => getFry(t.id)).filter(Boolean) as Fry[]
+    const topFries = top5.map(t => getFryMeta(t.id)).filter(Boolean) as FryMeta[]
     const spicyWords = /spice|cajun|nacho|pepper|heat|cumin|max seasoning/i
     const spiceHits = topFries.reduce((acc, f) => acc + ((f.tags || []).some(t => spicyWords.test(t.toLowerCase())) ? 1 : 0), 0)
     const spiceLane = spiceHits >= 3 ? "Seasoning-forward" : (spiceHits === 2 ? "Balanced" : "Clean + classic")
@@ -337,14 +444,14 @@ export default function FryRanker() {
 
     const sorted = [...taste].sort((a, b) => b.score - a.score)
     const top5HTML = sorted.slice(0, 5).map((t, i) => {
-      const fry = getFry(t.id)
+      const meta = getFryMeta(t.id)
       const pct = (t.wins + t.losses) ? Math.round((t.wins / (t.wins + t.losses)) * 100) : 0
       return `<div style="display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:${i < 4 ? '1px solid rgba(29,29,31,0.08)' : '0'};">
         <div style="min-width:0;">
-          <div style="font-weight:800; letter-spacing:-0.01em;">${i + 1}. ${fry ? fry.name : "—"}</div>
-          <div style="color: var(--text-secondary); font-weight:600; font-size:0.85rem;">${fry ? fry.style : ""} • ${t.comps} comps • ${pct}% win</div>
+          <div style="font-weight:800; letter-spacing:-0.01em;">${i + 1}. ${meta ? meta.name : "—"}</div>
+          <div style="color: var(--text-secondary); font-weight:600; font-size:0.85rem;">${meta ? meta.style : ""} • ${t.comps} comps • ${pct}% win</div>
         </div>
-        <div style="font-size:1.3rem; line-height:1;">${fry ? fry.emoji : "🍟"}</div>
+        <div style="font-size:1.3rem; line-height:1;">${meta ? meta.emoji : "🍟"}</div>
       </div>`
     }).join("")
 
@@ -393,7 +500,13 @@ export default function FryRanker() {
 
   const resetTaste = () => {
     setComparisons(0)
-    setTaste(initialFries.map(f => ({ id: f.id, score: 1500, wins: 0, losses: 0, comps: 0 })))
+    setTaste(fryMeta.map(f => ({ id: f.id, score: 1500, wins: 0, losses: 0, comps: 0 })))
+    try {
+      localStorage.removeItem(STORAGE_KEYS.taste)
+      localStorage.removeItem(STORAGE_KEYS.comparisons)
+    } catch (e) {
+      console.warn('Failed to clear localStorage:', e)
+    }
     setModalOpen(false)
   }
 
@@ -425,6 +538,24 @@ export default function FryRanker() {
 
   const sortedFries = [...fries].sort((a, b) => b.score - a.score)
   const summary = tasteSummary()
+
+  // Calculate total global votes
+  const totalGlobalVotes = fries.reduce((sum, f) => sum + f.battles, 0) / 2
+
+  // Show loading state until hydrated
+  if (!isHydrated || isLoading) {
+    return (
+      <div className="wrap">
+        <header>
+          <h1>Fry<span>Ranker</span></h1>
+          <p className="subtitle">The Definitive Fry Rankings.</p>
+        </header>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-secondary)' }}>
+          Loading the global fry standings...
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -502,8 +633,8 @@ export default function FryRanker() {
 
           <div className="leaderboard-container">
             <div className="section-title">
-              <span>Current Standings</span>
-              <small>Click a row for details</small>
+              <span>Global Standings</span>
+              <small>{Math.floor(totalGlobalVotes).toLocaleString()} total votes</small>
             </div>
             <div>
               {sortedFries.map((fry, index) => (
@@ -570,4 +701,3 @@ export default function FryRanker() {
     </>
   )
 }
-
