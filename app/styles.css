@@ -1,6 +1,6 @@
 :root {
-  --bg: #f5f1ea;
-  --card-bg: #fdfbf7;
+  --bg: #fdfbf7;
+  --card-bg: #f5f1ea;
   --fry-gold: #eeb400;
   --ketchup-red: #e11d2e;
   --text-main: #1d1d1f;
@@ -725,5 +725,34 @@ body.dark-mode .pill-btn {
 
 body.dark-mode .pill-btn.red {
   color: rgba(255, 100, 120, 0.95);
+}
+
+body.dark-mode .taste-btn {
+  color: rgba(229, 229, 229, 0.9);
+}
+
+body.dark-mode .close {
+  color: rgba(229, 229, 229, 0.9);
+}
+
+body.dark-mode .note {
+  color: rgba(229, 229, 229, 0.85);
+}
+
+body.dark-mode .modal h3 {
+  color: var(--text-main);
+}
+
+body.dark-mode .modal p {
+  color: var(--text-secondary);
+}
+
+body.dark-mode select {
+  color: rgba(229, 229, 229, 0.9);
+  background: var(--card-bg);
+}
+
+body.dark-mode .note a {
+  color: rgba(229, 229, 229, 0.9);
 }
 
