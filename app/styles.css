@@ -1,12 +1,12 @@
 :root {
-  --bg: #fdfbf7;
+  --bg: #f0ebe3;
   --card-bg: #fdfbf7;
   --fry-gold: #eeb400;
   --ketchup-red: #e11d2e;
   --text-main: #1d1d1f;
   --text-secondary: #86868b;
-  --shadow-light: 12px 12px 24px #ebe9e4, -12px -12px 24px #ffffff;
-  --shadow-inset: inset 6px 6px 12px #ebe9e4, inset -6px -6px 12px #ffffff;
+  --shadow-light: 8px 8px 20px #d9d4cc, -8px -8px 20px #ffffff;
+  --shadow-inset: inset 4px 4px 10px #e5e0d8, inset -4px -4px 10px #ffffff;
 }
 
 * {

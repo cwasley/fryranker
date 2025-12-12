@@ -1,7 +1,14 @@
-import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
-
 import { sql } from '@vercel/postgres';
+
+// Load env vars locally (Vercel loads them automatically in production)
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    const dotenv = require('dotenv');
+    dotenv.config({ path: '.env.local' });
+  } catch (e) {
+    // dotenv not available, that's ok in production
+  }
+}
 
 const initialFries = [
   { id: 0, name: "McDonald's", style: "Shoestring", score: 1500, battles: 0 },
