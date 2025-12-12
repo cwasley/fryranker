@@ -1,6 +1,5 @@
 import { sql } from '@vercel/postgres';
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get current scores and update in a single transaction-like flow
+    // Get current scores
     const { rows } = await sql`
       SELECT id, score FROM fries WHERE id IN (${winnerId}, ${loserId})
     `;
@@ -42,10 +41,6 @@ export async function POST(request: NextRequest) {
       sql`UPDATE fries SET score = ${newLoserScore}, battles = battles + 1 WHERE id = ${loserId}`
     ]);
 
-    // Invalidate the leaderboard cache so next fetch gets fresh data
-    revalidateTag('leaderboard');
-
-    // Return just the updates - frontend will fetch fresh leaderboard
     return NextResponse.json({ 
       success: true,
       updates: {
