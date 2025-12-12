@@ -68,7 +68,7 @@ const fryMeta: FryMeta[] = [
   { id: 9, name: "Burger King", style: "Thick Cut", emoji: "👑",
     tags: ["Thick cut", "Soft center", "Lightly crisp", "Classic fast-food"],
     note: "Hefty and straightforward—more potato-forward than crunchy." },
-  { id: 10, name: "KFC", style: "Seasoned Wedge", emoji: "🍗",
+  { id: 10, name: "KFC", style: "Seasoned Wedge", emoji: "👨🏻‍🦳",
     tags: ["Wedge cut", "Peppery", "Hearty", "Needs sauce"],
     note: "Wedges are built like side dishes. Best when dunked." },
   { id: 11, name: "Checkers/Rally's", style: "Famous Seasoned", emoji: "🚦",
@@ -94,7 +94,16 @@ const fryMeta: FryMeta[] = [
     note: "Not a fry, but it belongs here. Peak with chili + cheese." },
   { id: 18, name: "White Castle", style: "Crinkle Cut", emoji: "🏰",
     tags: ["Crinkle", "Soft middle", "Snackable", "Slider companion"],
-    note: "Crinkles made for tiny burgers. Hits different at 1 a.m." }
+    note: "Crinkles made for tiny burgers. Hits different at 1 a.m." },
+  { id: 19, name: "Carl's Jr./Hardee's", style: "Natural Cut", emoji: "⭐",
+    tags: ["Natural cut", "Crispy", "Salted", "Thick"],
+    note: "Underrated natural-cut fries. Crispy outside, fluffy inside." },
+  { id: 20, name: "Raising Cane's", style: "Crinkle Cut", emoji: "🐔",
+    tags: ["Crinkle", "Crispy", "Cane's sauce", "Chicken companion"],
+    note: "Built for dunking in Cane's sauce. The perfect chicken finger sidekick." },
+  { id: 21, name: "Dairy Queen", style: "Basket Fries", emoji: "🍦",
+    tags: ["Classic cut", "Salted", "Basket style", "Drive-in vibes"],
+    note: "Old-school basket fries. Best with a Blizzard chaser." }
 ]
 
 const REVEAL_AT = 18

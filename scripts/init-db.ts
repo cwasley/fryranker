@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 import { sql } from '@vercel/postgres';
 
 const initialFries = [
@@ -20,6 +23,9 @@ const initialFries = [
   { id: 16, name: "Del Taco", style: "Crinkle Cut", score: 1500, battles: 0 },
   { id: 17, name: "Sonic", style: "Tots", score: 1500, battles: 0 },
   { id: 18, name: "White Castle", style: "Crinkle Cut", score: 1500, battles: 0 },
+  { id: 19, name: "Carl's Jr./Hardee's", style: "Natural Cut", score: 1500, battles: 0 },
+  { id: 20, name: "Raising Cane's", style: "Crinkle Cut", score: 1500, battles: 0 },
+  { id: 21, name: "Dairy Queen", style: "Basket Fries", score: 1500, battles: 0 },
 ];
 
 async function initDb() {
@@ -35,25 +41,31 @@ async function initDb() {
     )
   `;
 
-  console.log('Checking if data exists...');
-  const { rows } = await sql`SELECT COUNT(*) as count FROM fries`;
+  console.log('Checking existing fries...');
+  const { rows: existingRows } = await sql`SELECT id FROM fries`;
+  const existingIds = new Set(existingRows.map(r => r.id));
   
-  if (parseInt(rows[0].count) === 0) {
-    console.log('Inserting initial fry data...');
+  const newFries = initialFries.filter(f => !existingIds.has(f.id));
+  
+  if (newFries.length > 0) {
+    console.log(`Adding ${newFries.length} new fries...`);
     
-    for (const fry of initialFries) {
+    for (const fry of newFries) {
       await sql`
         INSERT INTO fries (id, name, style, score, battles)
         VALUES (${fry.id}, ${fry.name}, ${fry.style}, ${fry.score}, ${fry.battles})
       `;
+      console.log(`  Added: ${fry.name}`);
     }
-    
-    console.log('Inserted', initialFries.length, 'fries');
   } else {
-    console.log('Data already exists, skipping insert');
+    console.log('All fries already exist in database');
   }
 
   console.log('Database initialization complete!');
+  
+  // Show current count
+  const { rows } = await sql`SELECT COUNT(*) as count FROM fries`;
+  console.log(`Total fries in database: ${rows[0].count}`);
 }
 
 initDb()
