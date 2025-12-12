@@ -17,22 +17,18 @@ export const categories: Category[] = [
 
 export default function CategoryNav() {
   const pathname = usePathname()
-  
+
   // Determine active category (default to 'fries' for '/')
   const activeSlug = pathname === '/' ? 'fries' : pathname.slice(1)
 
   return (
     <nav className="category-nav">
-      {categories.map(cat => {
+      {categories.map((cat) => {
         const isActive = activeSlug === cat.slug
         const href = cat.slug === 'fries' ? '/' : `/${cat.slug}`
-        
+
         return (
-          <Link
-            key={cat.slug}
-            href={href}
-            className={`category-tab ${isActive ? 'active' : ''}`}
-          >
+          <Link key={cat.slug} href={href} className={`category-tab ${isActive ? 'active' : ''}`}>
             <span className="category-emoji">{cat.emoji}</span>
             <span className="category-name">{cat.name}</span>
           </Link>
@@ -41,4 +37,3 @@ export default function CategoryNav() {
     </nav>
   )
 }
-

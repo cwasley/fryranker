@@ -14,7 +14,10 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    sans-serif;
   background: var(--bg);
   color: var(--text-main);
   margin: 0;
@@ -30,7 +33,7 @@ body {
 /* Ambient edge glow */
 body::before,
 body::after {
-  content: "";
+  content: '';
   position: fixed;
   inset: -220px;
   z-index: -1;
@@ -41,9 +44,9 @@ body::after {
 
 body::before {
   background:
-    radial-gradient(520px 520px at 12% 18%, rgba(238, 180, 0, 0.20), transparent 60%),
-    radial-gradient(560px 560px at 88% 28%, rgba(225, 29, 46, 0.10), transparent 62%),
-    radial-gradient(560px 560px at 50% 95%, rgba(238, 180, 0, 0.10), transparent 64%);
+    radial-gradient(520px 520px at 12% 18%, rgba(238, 180, 0, 0.2), transparent 60%),
+    radial-gradient(560px 560px at 88% 28%, rgba(225, 29, 46, 0.1), transparent 62%),
+    radial-gradient(560px 560px at 50% 95%, rgba(238, 180, 0, 0.1), transparent 64%);
 }
 
 body::after {
@@ -119,12 +122,12 @@ h1 span {
   box-shadow: var(--shadow-inset);
 }
 
-.bar>div {
+.bar > div {
   height: 100%;
   width: 18%;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(225, 29, 46, 0.95), rgba(238, 180, 0, 0.95));
-  box-shadow: 0 10px 28px rgba(225, 29, 46, 0.10);
+  box-shadow: 0 10px 28px rgba(225, 29, 46, 0.1);
   transition: width 0.35s ease;
 }
 
@@ -235,34 +238,34 @@ h1 span {
   .duel-container {
     overflow-x: hidden;
   }
-  
+
   .duel-cards {
     gap: 12px;
   }
-  
+
   .duel-card {
     padding: 24px 12px 20px;
     min-width: 0;
   }
-  
+
   .duel-card .emoji {
     font-size: 2.5rem;
   }
-  
+
   .duel-card h2 {
     font-size: 1.1rem;
     overflow-wrap: break-word;
     word-break: break-word;
   }
-  
+
   .duel-card .style-line {
     font-size: 0.85rem;
   }
-  
+
   .duel-card .chips {
     gap: 4px;
   }
-  
+
   .duel-card .chip {
     font-size: 0.7rem;
     padding: 5px 8px;
@@ -530,7 +533,7 @@ h1 span {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(225, 29, 46, 0.70);
+  color: rgba(225, 29, 46, 0.7);
   margin-bottom: 6px;
 }
 
@@ -596,7 +599,7 @@ h1 span {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(225, 29, 46, 0.70);
+  color: rgba(225, 29, 46, 0.7);
   margin-bottom: 6px;
 }
 
@@ -650,19 +653,35 @@ h1 span {
 
 /* Vote Animation */
 @keyframes votePress {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.95); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes votePulse {
-  0% { box-shadow: var(--shadow-light); }
-  50% { box-shadow: 0 0 0 4px rgba(238, 180, 0, 0.3), var(--shadow-light); }
-  100% { box-shadow: var(--shadow-light); }
+  0% {
+    box-shadow: var(--shadow-light);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(238, 180, 0, 0.3),
+      var(--shadow-light);
+  }
+  100% {
+    box-shadow: var(--shadow-light);
+  }
 }
 
 .duel-card.vote-animate {
-  animation: votePress 0.3s ease-out, votePulse 0.5s ease-out;
+  animation:
+    votePress 0.3s ease-out,
+    votePulse 0.5s ease-out;
 }
 
 /* Share Button */
@@ -679,7 +698,9 @@ h1 span {
   font-weight: 800;
   color: white;
   font-size: 0.95rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   margin-top: 16px;
 }
 
@@ -752,8 +773,7 @@ body.dark-mode::before {
 }
 
 body.dark-mode::after {
-  background:
-    radial-gradient(660px 660px at 85% 88%, rgba(225, 29, 46, 0.12), transparent 64%);
+  background: radial-gradient(660px 660px at 85% 88%, rgba(225, 29, 46, 0.12), transparent 64%);
 }
 
 body.dark-mode .chip {
@@ -804,4 +824,3 @@ body.dark-mode select {
 body.dark-mode .note a {
   color: rgba(229, 229, 229, 0.9);
 }
-
