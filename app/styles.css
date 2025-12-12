@@ -181,7 +181,10 @@ h1 span {
   font-size: 2rem;
   line-height: 1;
   flex: 0 0 auto;
-  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
 }
 
 .taste-btn {
@@ -642,6 +645,7 @@ h1 span {
   color: white;
   font-size: 0.95rem;
   transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 16px;
 }
 
 .share-btn:hover {
