@@ -101,16 +101,18 @@ export default function SauceRanker() {
     const topSauce = saucesData.find(s => s.id === sorted[0].id)
     if (!topSauce) return
 
-    const url = window.location.origin
-    const text = `My number 1 sauce is ${topSauce.name} ${topSauce.emoji}. What's yours?`
-    const fullMessage = `${text}\n${url}/sauces`
+    const url = `${window.location.origin}/sauces`
+    const text = `My #1 sauce is ${topSauce.name} ${topSauce.emoji}. What's yours?`
 
     if (navigator.share) {
       navigator.share({ 
-        title: 'SauceRanker', 
-        text: fullMessage
+        title: 'SauceRanker - The Definitive Sauce Standings', 
+        text: text,
+        url: url
       }).catch(() => {})
     } else {
+      // Fallback: copy to clipboard
+      const fullMessage = `${text}\n${url}`
       navigator.clipboard?.writeText(fullMessage)
       alert('Link copied to clipboard!')
     }

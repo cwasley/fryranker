@@ -179,17 +179,18 @@ export default function FryRanker() {
     const topFry = fryMeta.find(f => f.id === sorted[0].id)
     if (!topFry) return
 
-    const url = window.location.origin // Get just the base URL
-    const text = `My number 1 fry is ${topFry.name} ${topFry.emoji}. What's yours?`
-    const fullMessage = `${text}\n${url}`
+    const url = window.location.origin
+    const text = `My #1 fry is ${topFry.name} ${topFry.emoji}. What's yours?`
 
     if (navigator.share) {
       navigator.share({ 
-        title: 'FryRanker', 
-        text: fullMessage
+        title: 'FryRanker - The Definitive Spud Standings', 
+        text: text,
+        url: url
       }).catch(() => {})
     } else {
       // Fallback: copy to clipboard
+      const fullMessage = `${text}\n${url}`
       navigator.clipboard?.writeText(fullMessage)
       alert('Link copied to clipboard!')
     }

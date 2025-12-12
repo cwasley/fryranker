@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   title: 'FryRanker | The Definitive Spud Standings',
   description: 'Rank your favorite fast food fries through head-to-head matchups. Discover your personal fry preferences with FryRanker.',
   openGraph: {
