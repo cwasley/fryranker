@@ -305,39 +305,29 @@ export default function FryRanker() {
     })
     setComparisons(c => c + 1)
 
-    // Send vote to server for global leaderboard
-    try {
-      const res = await fetch('/api/vote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ winnerId: winner.id, loserId: loser.id })
-      })
-      
-      if (res.ok) {
-        const data = await res.json()
-        const merged = mergeFries(data.fries)
-        setFries(merged)
-      } else {
-        // API failed - update local state only
-        setFries(prev => {
-          const newFries = [...prev]
-          const winnerFry = newFries.find(f => f.id === winner.id)
-          const loserFry = newFries.find(f => f.id === loser.id)
-          if (winnerFry && loserFry) {
-            const K = 32
-            const expectedWinner = 1 / (1 + Math.pow(10, (loserFry.score - winnerFry.score) / 400))
-            const expectedLoser = 1 / (1 + Math.pow(10, (winnerFry.score - loserFry.score) / 400))
-            winnerFry.score = Math.round(winnerFry.score + K * (1 - expectedWinner))
-            loserFry.score = Math.round(loserFry.score + K * (0 - expectedLoser))
-            winnerFry.battles += 1
-            loserFry.battles += 1
-          }
-          return newFries
-        })
+    // Optimistically update local state immediately for snappy UI
+    setFries(prev => {
+      const newFries = [...prev]
+      const winnerFry = newFries.find(f => f.id === winner.id)
+      const loserFry = newFries.find(f => f.id === loser.id)
+      if (winnerFry && loserFry) {
+        const K = 32
+        const expectedWinner = 1 / (1 + Math.pow(10, (loserFry.score - winnerFry.score) / 400))
+        const expectedLoser = 1 / (1 + Math.pow(10, (winnerFry.score - loserFry.score) / 400))
+        winnerFry.score = Math.round(winnerFry.score + K * (1 - expectedWinner))
+        loserFry.score = Math.round(loserFry.score + K * (0 - expectedLoser))
+        winnerFry.battles += 1
+        loserFry.battles += 1
       }
-    } catch (error) {
-      console.error('Failed to record vote:', error)
-    }
+      return newFries
+    })
+
+    // Send vote to server (fire and forget - we already updated UI optimistically)
+    fetch('/api/vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ winnerId: winner.id, loserId: loser.id })
+    }).catch(error => console.error('Failed to record vote:', error))
 
     setTimeout(() => {
       pickNewDuel()

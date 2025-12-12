@@ -1,5 +1,6 @@
 import { sql } from '@vercel/postgres';
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get current scores
+    // Get current scores and update in a single transaction-like flow
     const { rows } = await sql`
       SELECT id, score FROM fries WHERE id IN (${winnerId}, ${loserId})
     `;
@@ -35,29 +36,18 @@ export async function POST(request: NextRequest) {
     const newWinnerScore = Math.round(winner.score + K * (1 - expectedWinner));
     const newLoserScore = Math.round(loser.score + K * (0 - expectedLoser));
 
-    // Update scores in database
-    await sql`
-      UPDATE fries 
-      SET score = ${newWinnerScore}, battles = battles + 1 
-      WHERE id = ${winnerId}
-    `;
-    
-    await sql`
-      UPDATE fries 
-      SET score = ${newLoserScore}, battles = battles + 1 
-      WHERE id = ${loserId}
-    `;
+    // Update both scores in parallel
+    await Promise.all([
+      sql`UPDATE fries SET score = ${newWinnerScore}, battles = battles + 1 WHERE id = ${winnerId}`,
+      sql`UPDATE fries SET score = ${newLoserScore}, battles = battles + 1 WHERE id = ${loserId}`
+    ]);
 
-    // Return updated leaderboard
-    const { rows: updatedFries } = await sql`
-      SELECT id, name, style, score, battles 
-      FROM fries 
-      ORDER BY score DESC
-    `;
+    // Invalidate the leaderboard cache so next fetch gets fresh data
+    revalidateTag('leaderboard');
 
+    // Return just the updates - frontend will fetch fresh leaderboard
     return NextResponse.json({ 
-      success: true, 
-      fries: updatedFries,
+      success: true,
       updates: {
         winner: { id: winnerId, newScore: newWinnerScore },
         loser: { id: loserId, newScore: newLoserScore }
