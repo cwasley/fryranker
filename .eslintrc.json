@@ -1,9 +1,7 @@
 {
-  "extends": ["next/core-web-vitals", "prettier"],
+  "extends": "next/core-web-vitals",
   "rules": {
     "semi": ["error", "never"],
-    "quotes": ["error", "single", { "avoidEscape": true }],
-    "indent": ["error", 2]
+    "quotes": ["error", "single", { "avoidEscape": true }]
   }
 }
-

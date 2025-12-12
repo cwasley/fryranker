@@ -290,20 +290,18 @@ export default function FryRanker() {
     if (!topFry) return
 
     const url = window.location.origin
-    const text = `My #1 fry is ${topFry.name} ${topFry.emoji}. What's yours?`
+    const text = `My #1 fry is ${topFry.name} ${topFry.emoji}. What's yours?\n\n${url}`
 
     if (navigator.share) {
       navigator
         .share({
           title: 'FryRanker - The Definitive Spud Standings',
           text: text,
-          url: url,
         })
         .catch(() => {})
     } else {
       // Fallback: copy to clipboard
-      const fullMessage = `${text}\n${url}`
-      navigator.clipboard?.writeText(fullMessage)
+      navigator.clipboard?.writeText(text)
       alert('Link copied to clipboard!')
     }
   }
