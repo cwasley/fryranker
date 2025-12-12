@@ -1,5 +1,5 @@
 :root {
-  --bg: #f0ebe3;
+  --bg: #f5f1ea;
   --card-bg: #fdfbf7;
   --fry-gold: #eeb400;
   --ketchup-red: #e11d2e;
@@ -581,5 +581,145 @@ h1 span {
   .statgrid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 640px;
+}
+
+.footer p {
+  margin: 8px 0;
+}
+
+.footer-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--fry-gold);
+}
+
+/* Vote Animation */
+@keyframes votePress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes votePulse {
+  0% { box-shadow: var(--shadow-light); }
+  50% { box-shadow: 0 0 0 4px rgba(238, 180, 0, 0.3), var(--shadow-light); }
+  100% { box-shadow: var(--shadow-light); }
+}
+
+.duel-card.vote-animate {
+  animation: votePress 0.3s ease-out, votePulse 0.5s ease-out;
+}
+
+/* Share Button */
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  cursor: pointer;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--fry-gold), var(--ketchup-red));
+  box-shadow: var(--shadow-light);
+  font-weight: 800;
+  color: white;
+  font-size: 0.95rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(238, 180, 0, 0.3);
+}
+
+.share-btn:active {
+  transform: translateY(0);
+}
+
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: var(--card-bg);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-light);
+  font-size: 1.4rem;
+  transition: transform 0.2s;
+}
+
+.dark-mode-toggle:hover {
+  transform: scale(1.1);
+}
+
+.dark-mode-toggle:active {
+  transform: scale(0.95);
+}
+
+/* Dark Mode Colors */
+body.dark-mode {
+  --bg: #1a1a1a;
+  --card-bg: #2a2a2a;
+  --text-main: #e5e5e5;
+  --text-secondary: #a0a0a0;
+  --shadow-light: 8px 8px 20px #0a0a0a, -8px -8px 20px #2a2a2a;
+  --shadow-inset: inset 4px 4px 10px #1a1a1a, inset -4px -4px 10px #2a2a2a;
+}
+
+body.dark-mode::before {
+  background:
+    radial-gradient(520px 520px at 12% 18%, rgba(238, 180, 0, 0.15), transparent 60%),
+    radial-gradient(560px 560px at 88% 28%, rgba(225, 29, 46, 0.08), transparent 62%),
+    radial-gradient(560px 560px at 50% 95%, rgba(238, 180, 0, 0.08), transparent 64%);
+}
+
+body.dark-mode::after {
+  background:
+    radial-gradient(660px 660px at 85% 88%, rgba(225, 29, 46, 0.12), transparent 64%);
+}
+
+body.dark-mode .chip {
+  color: rgba(229, 229, 229, 0.9);
+}
+
+body.dark-mode .chip.red {
+  color: rgba(255, 100, 120, 0.95);
+}
+
+body.dark-mode .footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .pill-btn {
+  color: rgba(229, 229, 229, 0.9);
+}
+
+body.dark-mode .pill-btn.red {
+  color: rgba(255, 100, 120, 0.95);
 }
 

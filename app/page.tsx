@@ -142,6 +142,8 @@ export default function FryRanker() {
   const [modalOpen, setModalOpen] = useState(false)
   const [isHydrated, setIsHydrated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [voteAnimating, setVoteAnimating] = useState<number | null>(null)
   const [modalContent, setModalContent] = useState<{
     emoji: string
     title: string
@@ -150,6 +152,33 @@ export default function FryRanker() {
     noteHTML: string
     actionsType: 'fry' | 'taste' | 'locked'
   } | null>(null)
+
+  // Dark mode effect
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+    }
+  }, [isDarkMode])
+
+  // Share function
+  const shareTopFry = () => {
+    const sorted = [...taste].sort((a, b) => b.score - a.score)
+    const topFry = fryMeta.find(f => f.id === sorted[0].id)
+    if (!topFry) return
+
+    const text = `My #1 fry is ${topFry.name} ${topFry.emoji} on FryRanker!`
+    const url = window.location.href
+
+    if (navigator.share) {
+      navigator.share({ title: 'FryRanker', text, url }).catch(() => {})
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard?.writeText(`${text} ${url}`)
+      alert('Link copied to clipboard!')
+    }
+  }
 
   // Fetch global leaderboard from database
   const fetchLeaderboard = useCallback(async () => {
@@ -289,6 +318,10 @@ export default function FryRanker() {
   const vote = async (winnerIndex: number) => {
     if (!currentPair) return
     setActiveVote(winnerIndex)
+    
+    // Trigger vote animation
+    setVoteAnimating(winnerIndex)
+    setTimeout(() => setVoteAnimating(null), 500)
 
     const winner = currentPair[winnerIndex]
     const loser = currentPair[winnerIndex === 0 ? 1 : 0]
@@ -558,6 +591,14 @@ export default function FryRanker() {
 
   return (
     <>
+      <button 
+        className="dark-mode-toggle" 
+        onClick={() => setIsDarkMode(!isDarkMode)}
+        aria-label="Toggle dark mode"
+      >
+        {isDarkMode ? '☀️' : '🌙'}
+      </button>
+
       <div className="wrap">
         <header>
           <h1>Fry<span>Ranker</span></h1>
@@ -583,6 +624,11 @@ export default function FryRanker() {
             <div className="taste-emoji">{summary.emoji}</div>
             <button className="taste-btn" onClick={openTasteResults}>View</button>
           </div>
+          {comparisons >= REVEAL_AT && (
+            <button className="share-btn" onClick={shareTopFry}>
+              🍟 Share my #1
+            </button>
+          )}
         </div>
 
         <div className="grid">
@@ -592,7 +638,7 @@ export default function FryRanker() {
               {currentPair && (
                 <>
                   <div 
-                    className={`duel-card ${activeVote === 0 ? 'active-vote' : ''}`}
+                    className={`duel-card ${activeVote === 0 ? 'active-vote' : ''} ${voteAnimating === 0 ? 'vote-animate' : ''}`}
                     onClick={() => vote(0)}
                   >
                     <div className="emoji">{currentPair[0].emoji}</div>
@@ -605,7 +651,7 @@ export default function FryRanker() {
                     </div>
                   </div>
                   <div 
-                    className={`duel-card ${activeVote === 1 ? 'active-vote' : ''}`}
+                    className={`duel-card ${activeVote === 1 ? 'active-vote' : ''} ${voteAnimating === 1 ? 'vote-animate' : ''}`}
                     onClick={() => vote(1)}
                   >
                     <div className="emoji">{currentPair[1].emoji}</div>
@@ -697,6 +743,10 @@ export default function FryRanker() {
           </div>
         </div>
       </div>
+
+      <footer className="footer">
+        <p>Made with 🍟 by fry enthusiasts Max & Collin</p>
+      </footer>
     </>
   )
 }
