@@ -228,23 +228,44 @@ h1 span {
   grid-template-columns: 1fr 1fr;
   gap: 30px;
   margin-top: 30px;
+  max-width: 100%;
 }
 
 @media (max-width: 760px) {
+  .duel-container {
+    overflow-x: hidden;
+  }
+  
   .duel-cards {
-    gap: 16px;
+    gap: 12px;
   }
   
   .duel-card {
-    padding: 32px 16px 26px;
+    padding: 24px 12px 20px;
+    min-width: 0;
   }
   
   .duel-card .emoji {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
   
   .duel-card h2 {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  
+  .duel-card .style-line {
+    font-size: 0.85rem;
+  }
+  
+  .duel-card .chips {
+    gap: 4px;
+  }
+  
+  .duel-card .chip {
+    font-size: 0.7rem;
+    padding: 5px 8px;
   }
 }
 
@@ -674,25 +695,35 @@ h1 span {
 /* Dark Mode Toggle */
 .dark-mode-toggle {
   position: fixed;
-  top: 14px;
+  top: 16px;
   right: 20px;
   z-index: 1001;
   background: var(--card-bg);
   border: 2px solid rgba(0, 0, 0, 0.08);
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   box-shadow: var(--shadow-light);
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   transition: transform 0.2s;
 }
 
 body.dark-mode .dark-mode-toggle {
   border-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 760px) {
+  .dark-mode-toggle {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    top: 18px;
+    right: 16px;
+  }
 }
 
 .dark-mode-toggle:hover {

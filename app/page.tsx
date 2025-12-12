@@ -156,14 +156,21 @@ export default function FryRanker() {
 
   // Dark mode effect
   useEffect(() => {
-    if (isDarkMode) {
-      document.body.classList.add('dark-mode')
-    } else {
-      document.body.classList.remove('dark-mode')
-    }
-    
-    // Force repaint on mobile browsers
-    void document.body.offsetHeight
+    // Use requestAnimationFrame to ensure repaint happens
+    requestAnimationFrame(() => {
+      if (isDarkMode) {
+        document.body.classList.add('dark-mode')
+      } else {
+        document.body.classList.remove('dark-mode')
+      }
+      
+      // Force repaint on mobile browsers (multiple techniques for iOS Safari)
+      void document.body.offsetHeight
+      document.body.style.transform = 'translateZ(0)'
+      requestAnimationFrame(() => {
+        document.body.style.transform = ''
+      })
+    })
   }, [isDarkMode])
 
   // Share function
