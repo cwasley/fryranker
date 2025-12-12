@@ -718,11 +718,11 @@ body.dark-mode .dark-mode-toggle {
 
 @media (max-width: 760px) {
   .dark-mode-toggle {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
-    top: 18px;
-    right: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    top: 12px;
+    right: 12px;
   }
 }
 
