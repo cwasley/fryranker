@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import CategoryNav from './components/CategoryNav'
 import './styles.css'
 
 // Local fry metadata (emoji, tags, notes - doesn't change)
@@ -160,6 +161,9 @@ export default function FryRanker() {
     } else {
       document.body.classList.remove('dark-mode')
     }
+    
+    // Force repaint on mobile browsers
+    void document.body.offsetHeight
   }, [isDarkMode])
 
   // Share function
@@ -168,14 +172,18 @@ export default function FryRanker() {
     const topFry = fryMeta.find(f => f.id === sorted[0].id)
     if (!topFry) return
 
-    const text = `My #1 fry is ${topFry.name} ${topFry.emoji} on FryRanker!`
-    const url = window.location.href
+    const url = window.location.origin // Get just the base URL
+    const text = `My number 1 fry is ${topFry.name} ${topFry.emoji}. What's yours?`
+    const fullMessage = `${text}\n${url}`
 
     if (navigator.share) {
-      navigator.share({ title: 'FryRanker', text, url }).catch(() => {})
+      navigator.share({ 
+        title: 'FryRanker', 
+        text: fullMessage
+      }).catch(() => {})
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard?.writeText(`${text} ${url}`)
+      navigator.clipboard?.writeText(fullMessage)
       alert('Link copied to clipboard!')
     }
   }
@@ -599,6 +607,8 @@ export default function FryRanker() {
         {isDarkMode ? '☀️' : '🌙'}
       </button>
 
+      <CategoryNav />
+
       <div className="wrap">
         <header>
           <h1>Fry<span>Ranker</span></h1>
@@ -745,7 +755,7 @@ export default function FryRanker() {
       </div>
 
       <footer className="footer">
-        <p>Made with 🍟 by fry enthusiasts Max & Collin</p>
+        <p>Made with 🍟 by fry enthusiasts <a href="https://maxjeffrey.com" target="_blank" rel="noopener noreferrer">Max</a> & <a href="https://github.com/cwasley" target="_blank" rel="noopener noreferrer">Collin</a></p>
       </footer>
     </>
   )

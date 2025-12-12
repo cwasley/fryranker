@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:init": "npx tsx scripts/init-db.ts"
+    "db:init": "npx tsx scripts/init-db.ts",
+    "db:init-sauces": "npx tsx scripts/init-sauces-db.ts"
   },
   "dependencies": {
     "@vercel/postgres": "^0.10.0",
