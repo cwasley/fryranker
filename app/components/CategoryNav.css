@@ -9,7 +9,7 @@
   justify-content: center;
   flex-wrap: wrap;
   padding: 20px;
-  background: var(--bg);
+  background: var(--card-bg);
 }
 
 .category-tab {
