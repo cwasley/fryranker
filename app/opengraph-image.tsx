@@ -9,9 +9,26 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image() {
-  const fontData = await fetch(
-    new URL('./Heavitas.ttf', import.meta.url)
-  ).then((res) => res.arrayBuffer())
+  let fontData: ArrayBuffer | undefined
+  try {
+    // Try to load from public directory first (for production)
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+    const fontUrl = `${baseUrl}/Heavitas.ttf`
+    fontData = await fetch(fontUrl).then((res) => {
+      if (!res.ok) throw new Error('Failed to fetch font')
+      return res.arrayBuffer()
+    })
+  } catch (error) {
+    // Fallback to local file (for development)
+    try {
+      fontData = await fetch(
+        new URL('./Heavitas.ttf', import.meta.url)
+      ).then((res) => res.arrayBuffer())
+    } catch (localError) {
+      console.error('Failed to load font:', localError)
+    }
+  }
 
   return new ImageResponse(
     <div
@@ -23,7 +40,7 @@ export default async function Image() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: 'Heavitas',
+        fontFamily: fontData ? 'Heavitas' : 'system-ui, -apple-system, sans-serif',
       }}
     >
       <div
@@ -42,14 +59,16 @@ export default async function Image() {
     </div>,
     {
       ...size,
-      fonts: [
-        {
-          name: 'Heavitas',
-          data: fontData,
-          style: 'normal',
-          weight: 800,
-        },
-      ],
+      fonts: fontData
+        ? [
+            {
+              name: 'Heavitas',
+              data: fontData,
+              style: 'normal',
+              weight: 800,
+            },
+          ]
+        : [],
     }
   )
 }
