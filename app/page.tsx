@@ -255,6 +255,7 @@ export default function FryRanker() {
   const [isLoading, setIsLoading] = useState(true)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [rateLimitedUntil, setRateLimitedUntil] = useState<number | null>(null)
+  const [lastVoteTime, setLastVoteTime] = useState(0)
   const [voteAnimating, setVoteAnimating] = useState<number | null>(null)
   const [modalContent, setModalContent] = useState<{
     emoji: string
@@ -265,14 +266,24 @@ export default function FryRanker() {
     actionsType: 'fry' | 'taste' | 'locked'
   } | null>(null)
 
-  // Dark mode effect
+  // Load dark mode preference from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('fryranker_darkmode')
+    if (saved === 'true') {
+      setIsDarkMode(true)
+    }
+  }, [])
+
+  // Dark mode effect - apply class and save preference
   useEffect(() => {
     // Use requestAnimationFrame to ensure repaint happens
     requestAnimationFrame(() => {
       if (isDarkMode) {
         document.body.classList.add('dark-mode')
+        localStorage.setItem('fryranker_darkmode', 'true')
       } else {
         document.body.classList.remove('dark-mode')
+        localStorage.setItem('fryranker_darkmode', 'false')
       }
 
       // Force repaint on mobile browsers (multiple techniques for iOS Safari)
@@ -465,9 +476,12 @@ export default function FryRanker() {
   }
 
   const isRateLimited = rateLimitedUntil !== null && Date.now() < rateLimitedUntil
+  const VOTE_COOLDOWN_MS = 1000 // 1 second between votes
 
   const vote = async (winnerIndex: number) => {
-    if (!currentPair || isRateLimited) return
+    const now = Date.now()
+    if (!currentPair || isRateLimited || now - lastVoteTime < VOTE_COOLDOWN_MS) return
+    setLastVoteTime(now)
     setActiveVote(winnerIndex)
 
     // Trigger vote animation
@@ -742,7 +756,7 @@ export default function FryRanker() {
           <h1>
             Fry<span>Ranker</span>
           </h1>
-          <p className="subtitle">The Definitive Fry Rankings.</p>
+          <p className="subtitle">The Definitive Fry Rankings</p>
         </header>
         <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-secondary)' }}>
           Loading the global fry standings...
@@ -856,6 +870,7 @@ export default function FryRanker() {
             <div
               style={{
                 marginTop: '14px',
+                marginBottom: '8px',
                 display: 'flex',
                 justifyContent: 'center',
                 gap: '10px',

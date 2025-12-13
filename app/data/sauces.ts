@@ -76,7 +76,7 @@ export const saucesData: SauceMeta[] = [
     id: 8,
     name: 'Buffalo',
     restaurant: 'Multiple',
-    emoji: '🔴',
+    emoji: '🦬',
     tags: ['Spicy', 'Tangy', 'Vinegary', 'Wing sauce'],
     note: 'Vinegar-forward heat. Made for fried things.',
   },

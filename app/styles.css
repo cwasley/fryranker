@@ -238,8 +238,8 @@ h1 span {
 
 @media (max-width: 760px) {
   .duel-container {
-    overflow-x: hidden;
-    padding: 0 8px;
+    overflow: visible;
+    padding: 0 8px 12px;
   }
 
   .duel-cards {
@@ -569,13 +569,19 @@ h1 span {
 .pill-btn {
   border: 0;
   cursor: pointer;
-  padding: 10px 12px;
+  padding: 10px 16px;
   border-radius: 999px;
   background: var(--bg);
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   font-weight: 800;
   color: rgba(29, 29, 31, 0.8);
   font-size: 0.9rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pill-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .pill-btn.red {
@@ -742,7 +748,6 @@ h1 span {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: var(--shadow-light);
   font-size: 1.2rem;
   transition: transform 0.2s;
 }
