@@ -215,6 +215,14 @@ const fryMeta: FryMeta[] = [
     tags: ['Classic cut', 'Salted', 'Basket style', 'Drive-in vibes'],
     note: 'Old-school basket fries. Best with a Blizzard chaser.',
   },
+  {
+    id: 22,
+    name: "Nathan's Famous",
+    style: 'Crinkle Cut',
+    emoji: '🌭',
+    tags: ['Crinkle', 'Crispy', 'Boardwalk classic', 'Hot dog companion'],
+    note: "Coney Island legend. Crinkle-cut nostalgia that pairs perfectly with a hot dog.",
+  },
 ]
 
 const REVEAL_AT = 18
