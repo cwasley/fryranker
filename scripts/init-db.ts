@@ -33,6 +33,7 @@ const initialFries = [
   { id: 19, name: "Carl's Jr./Hardee's", style: 'Natural Cut', score: 1500, battles: 0 },
   { id: 20, name: "Raising Cane's", style: 'Crinkle Cut', score: 1500, battles: 0 },
   { id: 21, name: 'Dairy Queen', style: 'Basket Fries', score: 1500, battles: 0 },
+  { id: 22, name: "Nathan's Famous", style: 'Crinkle Cut', score: 1500, battles: 0 },
 ]
 
 async function initDb() {
