@@ -782,7 +782,7 @@ export default function FryRanker() {
           <h1>
             Fry<span>Ranker</span>
           </h1>
-          <p className="subtitle">The Definitive Fry Rankings.</p>
+          <p className="subtitle">The Definitive Fry Rankings</p>
         </header>
 
         <div
