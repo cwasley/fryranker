@@ -639,18 +639,7 @@ h1 span {
   margin: 8px 0;
 }
 
-.footer a {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.2s;
-  border-bottom: 1px solid transparent;
-}
-
-.footer a:hover {
-  color: var(--fry-gold);
-  border-bottom-color: var(--fry-gold);
-}
+/* footer link styles removed (no creator links) */
 
 /* Vote Animation */
 @keyframes votePress {

@@ -946,14 +946,7 @@ export default function FryRanker() {
 
       <footer className="footer">
         <p>
-          Made with 🍟 by fry enthusiasts{' '}
-          <a href="https://maxjeffrey.com" target="_blank" rel="noopener noreferrer">
-            Max
-          </a>{' '}
-          &{' '}
-          <a href="https://github.com/cwasley" target="_blank" rel="noopener noreferrer">
-            Collin
-          </a>
+          Made with 🍟 by fry enthusiasts Max & Collin
         </p>
       </footer>
     </>
