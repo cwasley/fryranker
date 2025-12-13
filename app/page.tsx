@@ -713,26 +713,7 @@ export default function FryRanker() {
     setModalContent(null)
   }
 
-  // Keyboard handler
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault()
-        vote(0)
-      } else if (event.key === 'ArrowRight') {
-        event.preventDefault()
-        vote(1)
-      } else if (event.key === ' ' || event.key === 'Spacebar' || event.key === 'ArrowDown') {
-        event.preventDefault()
-        skipMatchup()
-      } else if (event.key === 'Escape') {
-        closeModal()
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [currentPair]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Keyboard shortcuts removed (mobile-first UX)
 
   const sortedFries = [...fries].sort((a, b) => b.score - a.score)
   const summary = tasteSummary()
@@ -864,9 +845,7 @@ export default function FryRanker() {
               </button>
             </div>
 
-            <div className="keyboard-hint">
-              Use <span className="key">←</span> or <span className="key">→</span> to vote quickly!
-            </div>
+            {/* Keyboard hint removed */}
           </div>
 
           <div className="leaderboard-container">
