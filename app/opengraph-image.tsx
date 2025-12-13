@@ -10,23 +10,32 @@ export const contentType = 'image/png'
 
 export default async function Image() {
   let fontData: ArrayBuffer | undefined
+  
   try {
-    // Try to load from public directory first (for production)
+    // Try to load from public directory using absolute URL
+    // In production, this will use the deployed domain
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
-    const fontUrl = `${baseUrl}/Heavitas.ttf`
-    fontData = await fetch(fontUrl).then((res) => {
-      if (!res.ok) throw new Error('Failed to fetch font')
-      return res.arrayBuffer()
-    })
+                    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined
+    
+    if (baseUrl) {
+      const fontUrl = `${baseUrl}/Heavitas.ttf`
+      const response = await fetch(fontUrl)
+      if (response.ok) {
+        fontData = await response.arrayBuffer()
+      }
+    }
   } catch (error) {
-    // Fallback to local file (for development)
+    // Continue to fallback
+  }
+  
+  // Fallback to local file (for development or if public URL fails)
+  if (!fontData) {
     try {
       fontData = await fetch(
         new URL('./Heavitas.ttf', import.meta.url)
       ).then((res) => res.arrayBuffer())
     } catch (localError) {
-      console.error('Failed to load font:', localError)
+      // Font will fall back to system font
     }
   }
 
