@@ -1,4 +1,11 @@
 import type { Metadata } from 'next'
+import localFont from 'next/font/local'
+
+const heavitas = localFont({
+  src: './Heavitas.ttf',
+  variable: '--font-display',
+  display: 'swap',
+})
 
 function getMetadataBase() {
   const explicit = process.env.NEXT_PUBLIC_BASE_URL
@@ -50,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body className={heavitas.variable}>{children}</body>
     </html>
   )
 }
