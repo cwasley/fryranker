@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"app/**/*.{ts,tsx,js,jsx,css}\" \"scripts/**/*.ts\"",
-    "db:init": "npx tsx scripts/init-db.ts",
-    "db:init-sauces": "npx tsx scripts/init-sauces-db.ts"
+    "db:init": "tsx scripts/init-db.ts",
+    "db:init-sauces": "tsx scripts/init-sauces-db.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
