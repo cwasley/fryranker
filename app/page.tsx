@@ -315,7 +315,7 @@ export default function FryRanker() {
     if (navigator.share) {
       navigator
         .share({
-          title: 'FryRanker - The Definitive Spud Standings',
+          title: 'FryRanker - The Definitive Fry Rankings',
           text: text,
         })
         .catch(() => {})

@@ -9,6 +9,10 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image() {
+  const fontData = await fetch(
+    new URL('./Heavitas.ttf', import.meta.url)
+  ).then((res) => res.arrayBuffer())
+
   return new ImageResponse(
     <div
       style={{
@@ -19,41 +23,33 @@ export default async function Image() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
+        fontFamily: 'Heavitas',
       }}
     >
       <div
         style={{
-          fontSize: 120,
-          fontWeight: 900,
+          fontSize: 180,
+          fontWeight: 800,
           display: 'flex',
           alignItems: 'center',
-          gap: 20,
+          gap: 24,
+          letterSpacing: '-0.04em',
         }}
       >
         <span style={{ color: '#1d1d1f' }}>Fry</span>
         <span style={{ color: '#eeb400' }}>Ranker</span>
       </div>
-      <div
-        style={{
-          fontSize: 36,
-          color: '#86868b',
-          marginTop: 20,
-        }}
-      >
-        The Definitive Spud Standings
-      </div>
-      <div
-        style={{
-          fontSize: 80,
-          marginTop: 40,
-        }}
-      >
-        🍟
-      </div>
     </div>,
     {
       ...size,
+      fonts: [
+        {
+          name: 'Heavitas',
+          data: fontData,
+          style: 'normal',
+          weight: 800,
+        },
+      ],
     }
   )
 }

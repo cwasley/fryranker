@@ -20,11 +20,15 @@ function getMetadataBase() {
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
-  title: 'FryRanker | The Definitive Spud Standings',
+  title: 'FryRanker | The Definitive Fry Rankings',
   description:
     'Rank your favorite fast food fries through head-to-head matchups. Discover your personal fry preferences with FryRanker.',
+  icons: {
+    icon: '/icon.svg',
+    apple: '/apple-icon.svg',
+  },
   openGraph: {
-    title: 'FryRanker | The Definitive Spud Standings',
+    title: 'FryRanker | The Definitive Fry Rankings',
     description:
       'Rank your favorite fast food fries through head-to-head matchups. Which fries reign supreme?',
     type: 'website',
@@ -35,13 +39,13 @@ export const metadata: Metadata = {
         url: '/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'FryRanker - The Definitive Spud Standings',
+        alt: 'FryRanker - The Definitive Fry Rankings',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FryRanker | The Definitive Spud Standings',
+    title: 'FryRanker | The Definitive Fry Rankings',
     description: 'Rank your favorite fast food fries through head-to-head matchups.',
     images: ['/opengraph-image'],
   },
