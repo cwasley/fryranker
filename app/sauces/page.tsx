@@ -114,18 +114,18 @@ export default function SauceRanker() {
     if (!topSauce) return
 
     const url = `${window.location.origin}/sauces`
-    const text = `My #1 sauce is ${topSauce.name} ${topSauce.emoji}. What's yours?\n\n${url}`
+    const message = `My #1 sauce is ${topSauce.name} ${topSauce.emoji}. What's yours?`
+    const text = `${message}\n\n${url}`
 
     if (navigator.share) {
       navigator
         .share({
-          title: 'SauceRanker - The Definitive Sauce Standings',
           text: text,
         })
         .catch(() => {})
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard?.writeText(text)
+      navigator.clipboard?.writeText(`${text}\n\n${url}`)
       alert('Link copied to clipboard!')
     }
   }

@@ -310,18 +310,18 @@ export default function FryRanker() {
     if (!topFry) return
 
     const url = window.location.origin
-    const text = `My #1 fry is ${topFry.name} ${topFry.emoji}. What's yours?\n\n${url}`
+    const message = `My #1 fry is ${topFry.name} ${topFry.emoji}. What's yours?`
+    const text = `${message}\n\n${url}`
 
     if (navigator.share) {
       navigator
         .share({
-          title: 'FryRanker - The Definitive Fry Rankings',
           text: text,
         })
         .catch(() => {})
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard?.writeText(text)
+      navigator.clipboard?.writeText(`${text}\n\n${url}`)
       alert('Link copied to clipboard!')
     }
   }
