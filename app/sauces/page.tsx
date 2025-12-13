@@ -66,6 +66,7 @@ export default function SauceRanker() {
   const [isHydrated, setIsHydrated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [rateLimitedUntil, setRateLimitedUntil] = useState<number | null>(null)
   const [voteAnimating, setVoteAnimating] = useState<number | null>(null)
   const [modalContent, setModalContent] = useState<{
     emoji: string
@@ -272,8 +273,10 @@ export default function SauceRanker() {
     return 'Vote a few times to start dialing in your personal #1.'
   }
 
+  const isRateLimited = rateLimitedUntil !== null && Date.now() < rateLimitedUntil
+
   const vote = async (winnerIndex: number) => {
-    if (!currentPair) return
+    if (!currentPair || isRateLimited) return
     setActiveVote(winnerIndex)
 
     // Trigger vote animation
@@ -321,14 +324,18 @@ export default function SauceRanker() {
       return newSauces
     })
 
-    // Send vote to server (if rate-limited, resync global leaderboard on next paint)
+    // Send vote to server (if rate-limited, resync global leaderboard)
     fetch('/api/sauces/vote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ winnerId: winner.id, loserId: loser.id }),
     })
       .then((res) => {
-        if (!res.ok) {
+        if (res.status === 429) {
+          // Rate limited - disable voting for 60 seconds
+          setRateLimitedUntil(Date.now() + 60000)
+          fetchLeaderboard()
+        } else if (!res.ok) {
           fetchLeaderboard()
         }
       })
@@ -581,11 +588,20 @@ export default function SauceRanker() {
         <div className="grid">
           <div className="duel-container">
             <p className="duel-kicker">Which is better?</p>
-            <div className="duel-cards">
+            {isRateLimited && (
+              <div className="rate-limit-notice">
+                <strong>Easy on the sauce.</strong>
+                <br />
+                We love the passion, but let things simmer for a sec.
+                <br />
+                Come back in a bit and keep the rankings honest.
+              </div>
+            )}
+            <div className={`duel-cards ${isRateLimited ? 'disabled' : ''}`}>
               {currentPair && (
                 <>
                   <div
-                    className={`duel-card ${activeVote === 0 ? 'active-vote' : ''} ${voteAnimating === 0 ? 'vote-animate' : ''}`}
+                    className={`duel-card ${activeVote === 0 ? 'active-vote' : ''} ${voteAnimating === 0 ? 'vote-animate' : ''} ${isRateLimited ? 'disabled' : ''}`}
                     onClick={() => vote(0)}
                   >
                     <div className="emoji">{currentPair[0].emoji}</div>
@@ -600,7 +616,7 @@ export default function SauceRanker() {
                     </div>
                   </div>
                   <div
-                    className={`duel-card ${activeVote === 1 ? 'active-vote' : ''} ${voteAnimating === 1 ? 'vote-animate' : ''}`}
+                    className={`duel-card ${activeVote === 1 ? 'active-vote' : ''} ${voteAnimating === 1 ? 'vote-animate' : ''} ${isRateLimited ? 'disabled' : ''}`}
                     onClick={() => vote(1)}
                   >
                     <div className="emoji">{currentPair[1].emoji}</div>
