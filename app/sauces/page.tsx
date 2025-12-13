@@ -534,7 +534,7 @@ export default function SauceRanker() {
             <h1>
               Sauce<span>Ranker</span>
             </h1>
-            <p className="subtitle">The Definitive Sauce Rankings.</p>
+            <p className="subtitle">The Definitive Sauce Rankings</p>
           </header>
           <div
             style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-secondary)' }}
@@ -563,7 +563,7 @@ export default function SauceRanker() {
           <h1>
             Sauce<span>Ranker</span>
           </h1>
-          <p className="subtitle">The Definitive Sauce Rankings.</p>
+          <p className="subtitle">The Definitive Sauce Rankings</p>
         </header>
 
         <div
@@ -720,22 +720,6 @@ export default function SauceRanker() {
             dangerouslySetInnerHTML={{ __html: modalContent?.noteHTML || '' }}
           />
           <div className="modal-actions">
-            {modalContent?.actionsType === 'sauce' && (
-              <>
-                <button
-                  className="pill-btn"
-                  onClick={() => {
-                    pickNewDuel()
-                    closeModal()
-                  }}
-                >
-                  New matchup
-                </button>
-                <button className="pill-btn red" onClick={closeModal}>
-                  Back to ranking
-                </button>
-              </>
-            )}
             {modalContent?.actionsType === 'taste' && (
               <>
                 <button className="pill-btn" onClick={closeModal}>

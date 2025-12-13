@@ -949,22 +949,6 @@ export default function FryRanker() {
           />
 
           <div className="modal-actions">
-            {modalContent?.actionsType === 'fry' && (
-              <>
-                <button
-                  className="pill-btn"
-                  onClick={() => {
-                    pickNewDuel()
-                    closeModal()
-                  }}
-                >
-                  New matchup
-                </button>
-                <button className="pill-btn red" onClick={closeModal}>
-                  Back to ranking
-                </button>
-              </>
-            )}
             {modalContent?.actionsType === 'taste' && (
               <>
                 <button className="pill-btn" onClick={closeModal}>
