@@ -321,12 +321,18 @@ export default function SauceRanker() {
       return newSauces
     })
 
-    // Send vote to server
+    // Send vote to server (if rate-limited, resync global leaderboard on next paint)
     fetch('/api/sauces/vote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ winnerId: winner.id, loserId: loser.id }),
-    }).catch((error) => console.error('Failed to record vote:', error))
+    })
+      .then((res) => {
+        if (!res.ok) {
+          fetchLeaderboard()
+        }
+      })
+      .catch((error) => console.error('Failed to record vote:', error))
 
     setTimeout(() => {
       pickNewDuel()

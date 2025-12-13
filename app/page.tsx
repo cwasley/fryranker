@@ -512,12 +512,19 @@ export default function FryRanker() {
       return newFries
     })
 
-    // Send vote to server (fire and forget - we already updated UI optimistically)
+    // Send vote to server (if rate-limited, resync global leaderboard on next paint)
     fetch('/api/vote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ winnerId: winner.id, loserId: loser.id }),
-    }).catch((error) => console.error('Failed to record vote:', error))
+    })
+      .then((res) => {
+        if (!res.ok) {
+          // If server rejected (e.g. 429), correct global leaderboard on refresh
+          fetchLeaderboard()
+        }
+      })
+      .catch((error) => console.error('Failed to record vote:', error))
 
     setTimeout(() => {
       pickNewDuel()
