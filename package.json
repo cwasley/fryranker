@@ -12,6 +12,7 @@
     "db:init-sauces": "npx tsx scripts/init-sauces-db.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "@vercel/postgres": "^0.10.0",
     "next": "^14.2.0",
     "react": "^18.2.0",

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import { Analytics } from '@vercel/analytics/react'
 
 const heavitas = localFont({
   src: './Heavitas.ttf',
@@ -57,7 +58,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className={heavitas.variable}>{children}</body>
+      <body className={heavitas.variable}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
