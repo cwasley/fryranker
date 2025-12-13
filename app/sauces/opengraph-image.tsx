@@ -11,35 +11,38 @@ export const contentType = 'image/png'
 export default async function Image() {
   let fontData: ArrayBuffer | undefined
   
+  // Try to load font - if it fails, we'll use system font
   try {
-    // Try to load from public directory using absolute URL
-    // In production, this will use the deployed domain
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-                    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined
+    // Use production domain from NEXT_PUBLIC_BASE_URL
+    // Set NEXT_PUBLIC_BASE_URL=https://fryranker.com in Vercel env vars
+    // Don't use VERCEL_URL as it's a preview URL that requires auth
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
     
+    // Try fetching from public directory if we have a base URL
     if (baseUrl) {
       const fontUrl = `${baseUrl}/Heavitas.ttf`
-      const response = await fetch(fontUrl)
+      const response = await fetch(fontUrl, { 
+        cache: 'no-store',
+        headers: { 'Accept': 'application/font-ttf' }
+      })
       if (response.ok) {
         fontData = await response.arrayBuffer()
       }
     }
-  } catch (error) {
-    // Continue to fallback
-  }
-  
-  // Fallback to local file (for development or if public URL fails)
-  if (!fontData) {
-    try {
+    
+    // Fallback to local file (development or if production URL fetch failed)
+    if (!fontData) {
       fontData = await fetch(
         new URL('../Heavitas.ttf', import.meta.url)
       ).then((res) => res.arrayBuffer())
-    } catch (localError) {
-      // Font will fall back to system font
     }
+  } catch (error) {
+    // Font will fall back to system font - this is fine
+    console.error('Font loading failed, using system font:', error)
   }
 
-  return new ImageResponse(
+  try {
+    return new ImageResponse(
     <div
       style={{
         background: '#fdfbf7',
@@ -79,5 +82,38 @@ export default async function Image() {
           ]
         : [],
     }
-  )
+    )
+  } catch (error) {
+    console.error('ImageResponse error:', error)
+    // Return a simple fallback image
+    return new ImageResponse(
+      <div
+        style={{
+          background: '#fdfbf7',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 180,
+            fontWeight: 800,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 24,
+            letterSpacing: '-0.04em',
+          }}
+        >
+          <span style={{ color: '#1d1d1f' }}>Sauce</span>
+          <span style={{ color: '#eeb400' }}>Ranker</span>
+        </div>
+      </div>,
+      { ...size }
+    )
+  }
 }
