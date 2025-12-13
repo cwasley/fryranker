@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Analytics } from './components/Analytics'
 
 function getMetadataBase() {
   const explicit = process.env.NEXT_PUBLIC_BASE_URL
@@ -50,7 +51,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Analytics />
+        {children}
+      </body>
     </html>
   )
 }
