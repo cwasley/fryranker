@@ -483,6 +483,7 @@ nav.tabs a[aria-current] {
   position: absolute;
   right: 12px;
   bottom: 12px;
+  z-index: 4;
   max-width: calc(100% - 24px);
   white-space: nowrap;
   background: var(--ketchup);
