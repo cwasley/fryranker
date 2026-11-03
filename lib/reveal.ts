@@ -21,7 +21,7 @@ export const isHotTake = (s: Split) => s.pct < 50
 
 export function badge(s: Split) {
   if (isHotTake(s)) return `Hot take · ${s.pct}%`
-  return s.direct ? `${s.pct}% agree` : 'Crowd favorite'
+  return s.direct ? `${s.pct}% agree` : 'Crowd pick'
 }
 
 export function verdict(s: Split, pick: string) {

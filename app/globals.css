@@ -483,9 +483,11 @@ nav.tabs a[aria-current] {
   position: absolute;
   right: 12px;
   bottom: 12px;
+  max-width: calc(100% - 24px);
+  white-space: nowrap;
   background: var(--ketchup);
   color: #fff6e5;
-  font-size: 20px;
+  font-size: 18px;
   padding: 6px 10px 4px;
   border-radius: 999px;
   border: var(--line) solid #22140c;
