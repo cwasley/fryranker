@@ -13,20 +13,16 @@ export type Category = {
   home: string
   /** Prefix for item, matchup and share pages. */
   base: string
-  brand: [string, string]
-  tagline: string
   navLabel: string
-  emoji: string
   one: string
   many: string
   /** "fast food fries": the phrase people search for. */
   plural: string
   kindLabel: string
+  /** Heading for the item page's tag list. */
+  ticketTitle: string
   voteApi: string
   storageKey: string
-  /** Comparisons needed before the taste profile takes shape, unlocks and locks. */
-  thresholds: { shape: number; reveal: number; lock: number }
-  spicy: RegExp
   insights: (top: Item[]) => Insight[]
   matchupTitle: (a: Item, b: Item) => string
 }
@@ -113,18 +109,14 @@ export const categories: Record<Category['key'], Category> = {
     items: fries,
     home: '/',
     base: '/fries',
-    brand: ['Fry', 'Ranker'],
-    tagline: 'The Definitive Fry Rankings',
     navLabel: 'Fries',
-    emoji: '🍟',
     one: 'fry',
     many: 'fries',
     plural: 'fast food fries',
-    kindLabel: 'Style',
+    kindLabel: 'Cut',
+    ticketTitle: "What you're getting",
     voteApi: '/api/vote',
     storageKey: 'fryranker',
-    thresholds: { shape: 8, reveal: 18, lock: 36 },
-    spicy: /spice|cajun|nacho|pepper|heat|cumin|garlic/i,
     insights: fryInsights,
     matchupTitle: (a, b) => `${a.name} vs ${b.name} Fries`,
   },
@@ -134,18 +126,14 @@ export const categories: Record<Category['key'], Category> = {
     items: sauces,
     home: '/sauces',
     base: '/sauces',
-    brand: ['Sauce', 'Ranker'],
-    tagline: 'The Definitive Sauce Rankings',
     navLabel: 'Sauces',
-    emoji: '🌶️',
     one: 'sauce',
     many: 'sauces',
     plural: 'fast food sauces',
     kindLabel: 'From',
+    ticketTitle: "What's in the cup",
     voteApi: '/api/sauces/vote',
     storageKey: 'sauceranker',
-    thresholds: { shape: 6, reveal: 12, lock: 24 },
-    spicy: /spice|spicy|heat|hot|cajun|pepper|fire/i,
     insights: sauceInsights,
     matchupTitle: (a, b) => `${a.fullName} vs ${b.fullName}`,
   },

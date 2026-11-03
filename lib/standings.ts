@@ -48,12 +48,16 @@ export const getMatchups = cache(async (category: Category) => {
         : { wins: row.b_wins, losses: row.a_wins }
     },
     pairs: rows,
+    rows: rows.map((r): MatchupRow => [r.a, r.b, r.a_wins, r.b_wins]),
   }
 })
 
 export type Matchups = Awaited<ReturnType<typeof getMatchups>>
 
-/** Below this many head-to-head votes a matchup page is kept out of search results. */
-export const INDEXABLE_MATCHUP_VOTES = 10
+/** Matchup pages stay out of search results until their split comes from direct votes. */
+export { DIRECT_VOTES as INDEXABLE_MATCHUP_VOTES } from './reveal'
+
+/** Compact `[a, b, aWins, bWins]` rows for the client, which looks up splits as people vote. */
+export type MatchupRow = [number, number, number, number]
 
 export const MATCHUPS_SINCE = 'November 2026'

@@ -1,6 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react'
 import type { Category } from './categories'
-import type { Item } from './items'
 import { eloDelta, START_SCORE, TASTE_K } from './elo'
 
 export type TasteEntry = { id: number; score: number; wins: number; losses: number; comps: number }
@@ -125,31 +124,3 @@ export function useTaste(category: Category) {
 }
 
 export const rankedTaste = (taste: Taste) => [...taste.entries].sort((a, b) => b.score - a.score)
-
-export function confidencePct(category: Category, comparisons: number) {
-  if (comparisons >= category.thresholds.lock) return 100
-  return Math.max(18, Math.min(100, 18 + Math.log10(comparisons + 1) * 52))
-}
-
-export function confidenceHint(category: Category, comparisons: number) {
-  const { shape, reveal, lock } = category.thresholds
-  if (comparisons >= lock) return `Locked. You have a very real ${category.one} opinion now.`
-  if (comparisons >= reveal) return 'This is getting specific. The #1 is starting to separate.'
-  if (comparisons >= shape) return 'Nice. Your taste profile is taking shape.'
-  return 'Vote a few times to start dialing in your personal #1.'
-}
-
-/** The tag shared by the most of `items`. */
-export function topTag(items: Item[]) {
-  const counts = new Map<string, number>()
-  for (const item of items) for (const tag of item.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1)
-  let best = ''
-  let bestCount = 0
-  for (const [tag, count] of counts) {
-    if (count > bestCount) {
-      best = tag
-      bestCount = count
-    }
-  }
-  return best
-}

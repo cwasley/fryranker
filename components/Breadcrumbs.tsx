@@ -7,7 +7,7 @@ type Crumb = { name: string; href: string }
 export default function Breadcrumbs({ trail }: { trail: Crumb[] }) {
   return (
     <>
-      <nav className="breadcrumbs" aria-label="Breadcrumb">
+      <nav className="crumbs" aria-label="Breadcrumb">
         <ol>
           {trail.map((crumb, i) => (
             <li key={crumb.href}>

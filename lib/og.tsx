@@ -1,149 +1,173 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type { Category } from './categories'
+import { glyphSvg } from './glyphs'
+import type { Item } from './items'
 
 export const OG_SIZE = { width: 1200, height: 630 }
 
 // Light-scheme tokens from globals.css; the card renders outside the page.
-const C = {
-  bg: '#fdfbf7',
-  card: '#f5f1ea',
-  ink: '#1d1d1f',
-  soft: '#6e6e73',
-  gold: '#eeb400',
-  red: '#e11d2e',
+export const C = {
+  paper: '#fff6e5',
+  ink: '#22140c',
+  soft: '#6b5546',
+  red: '#d62718',
+  mustard: '#ffbf1f',
+  receipt: '#fffdf7',
 }
 
-type Font = { name: string; data: ArrayBuffer | Buffer; weight: 400 | 600 | 800; style: 'normal' }
+type Font = { name: string; data: Buffer; weight: 600 | 800 | 900; style: 'normal' }
 
 let fonts: Promise<Font[]> | undefined
 
-/**
- * Satori needs TTF, not the woff2 next/font serves. Heavitas ships in the repo;
- * Inter comes from Google Fonts, which returns TTF to a bare server fetch.
- */
+// Static TTFs ship in the repo: Satori can't read the woff2 that next/font serves,
+// and fetching fonts at render time would make every card depend on the network.
 function loadFonts() {
-  fonts ??= (async () => {
-    const heavitas = await readFile(join(process.cwd(), 'assets/Heavitas.ttf'))
-    const loaded: Font[] = [{ name: 'Heavitas', data: heavitas, weight: 800, style: 'normal' }]
-    for (const weight of [600, 800] as const) {
-      try {
-        const css = await fetch(
-          `https://fonts.googleapis.com/css2?family=Inter:wght@${weight}`
-        ).then((res) => res.text())
-        const url = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype)'\)/)?.[1]
-        if (url)
-          loaded.push({
-            name: 'Inter',
-            data: await fetch(url).then((r) => r.arrayBuffer()),
-            weight,
-            style: 'normal',
-          })
-      } catch (error) {
-        console.error(`Inter ${weight} unavailable for OG cards:`, error)
-      }
-    }
-    return loaded
-  })()
+  const file = (name: string) => readFile(join(process.cwd(), 'assets/fonts', name))
+  fonts ??= Promise.all([
+    file('Archivo-ExtraCondensedBlack.ttf'),
+    file('Archivo-SemiBold.ttf'),
+    file('Archivo-ExtraBold.ttf'),
+  ]).then(([cond, semi, bold]) => [
+    { name: 'Cond', data: cond, weight: 900, style: 'normal' },
+    { name: 'Archivo', data: semi, weight: 600, style: 'normal' },
+    { name: 'Archivo', data: bold, weight: 800, style: 'normal' },
+  ])
   return fonts
 }
 
-function Wordmark({ brand, size = 44 }: { brand: [string, string]; size?: number }) {
-  return (
-    <div
-      style={{ display: 'flex', fontFamily: 'Heavitas', fontSize: size, letterSpacing: '-0.02em' }}
-    >
-      <span style={{ color: C.ink }}>{brand[0]}</span>
-      <span style={{ color: C.gold }}>{brand[1]}</span>
-    </div>
-  )
-}
+const flex = (style: CSSProperties = {}): CSSProperties => ({ display: 'flex', ...style })
 
-export async function ogCard(category: Category, body: ReactNode, footer?: string) {
-  return new ImageResponse(
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '56px 72px',
-        fontFamily: 'Inter',
-        color: C.ink,
-        background: `radial-gradient(circle at 10% 15%, rgba(238,180,0,0.22), transparent 45%), radial-gradient(circle at 92% 90%, rgba(225,29,46,0.12), transparent 45%), ${C.bg}`,
-      }}
-    >
-      <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center' }}>
-        {body}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Wordmark brand={category.brand} />
-        {footer && <div style={{ fontSize: 28, fontWeight: 600, color: C.soft }}>{footer}</div>}
-      </div>
-    </div>,
-    { ...OG_SIZE, fonts: await loadFonts(), emoji: 'twemoji' }
-  )
-}
+export const cond = (size: number, style: CSSProperties = {}): CSSProperties => ({
+  display: 'flex',
+  fontFamily: 'Cond',
+  fontWeight: 900,
+  fontSize: size,
+  lineHeight: 0.9,
+  textTransform: 'uppercase',
+  ...style,
+})
 
-export const Kicker = ({ children }: { children: ReactNode }) => (
-  <div
-    style={{
-      display: 'flex',
-      fontSize: 30,
-      fontWeight: 800,
-      letterSpacing: '0.08em',
-      textTransform: 'uppercase',
-      color: C.red,
-    }}
-  >
-    {children}
-  </div>
-)
-
-export const Title = ({ children, size = 84 }: { children: ReactNode; size?: number }) => (
-  <div
-    style={{
-      display: 'flex',
-      fontFamily: 'Heavitas',
-      fontSize: size,
-      lineHeight: 1.05,
-      letterSpacing: '-0.02em',
-      marginTop: 12,
-    }}
-  >
-    {children}
-  </div>
-)
-
-export const Sub = ({ children }: { children: ReactNode }) => (
-  <div style={{ display: 'flex', fontSize: 36, fontWeight: 600, color: C.soft, marginTop: 18 }}>
-    {children}
-  </div>
-)
-
-export const Emoji = ({ children, size = 150 }: { children: string; size?: number }) => (
-  <div style={{ display: 'flex', fontSize: size, lineHeight: 1 }}>{children}</div>
-)
-
-export function RankList({ rows }: { rows: { emoji: string; name: string; meta?: string }[] }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 24 }}>
-      {rows.map((row, i) => (
+function Checker() {
+  const row = (offset: number) => (
+    <div style={flex()}>
+      {Array.from({ length: 40 }, (_, i) => (
         <div
-          key={row.name}
-          style={{ display: 'flex', alignItems: 'center', gap: 22, fontSize: 40 }}
-        >
-          <div style={{ display: 'flex', width: 44, fontWeight: 800, color: C.gold }}>{i + 1}</div>
-          <div style={{ display: 'flex', fontSize: 44 }}>{row.emoji}</div>
-          <div style={{ display: 'flex', fontWeight: 800 }}>{row.name}</div>
-          {row.meta && (
-            <div style={{ display: 'flex', fontWeight: 600, color: C.soft }}>{row.meta}</div>
-          )}
-        </div>
+          key={i}
+          style={{ width: 30, height: 15, background: (i + offset) % 2 ? C.paper : C.red }}
+        />
       ))}
     </div>
+  )
+  return (
+    <div style={flex({ flexDirection: 'column' })}>
+      {row(0)}
+      {row(1)}
+    </div>
+  )
+}
+
+export function Logo({ size = 46 }: { size?: number }) {
+  return (
+    <div
+      style={cond(size, {
+        background: C.red,
+        color: C.paper,
+        padding: '8px 14px 4px',
+        border: `4px solid ${C.ink}`,
+        boxShadow: `6px 6px 0 ${C.ink}`,
+        transform: 'rotate(-2deg)',
+      })}
+    >
+      Fry<span style={{ color: C.mustard }}>Ranker</span>
+    </div>
+  )
+}
+
+export function Disc({ category, item, size }: { category: Category; item: Item; size: number }) {
+  const uri = `data:image/svg+xml;base64,${Buffer.from(glyphSvg(category, item)).toString('base64')}`
+  return (
+    <div
+      style={flex({
+        width: size,
+        height: size,
+        flexShrink: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: size,
+        background: category.key === 'sauces' ? C.paper : C.mustard,
+        border: `5px solid ${C.ink}`,
+        boxShadow: `9px 9px 0 ${C.ink}`,
+      })}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={uri} width={size * 0.68} height={size * 0.68} alt="" />
+    </div>
+  )
+}
+
+export const Plate = ({ children }: { children: ReactNode }) => (
+  <div
+    style={cond(34, {
+      alignSelf: 'flex-start',
+      background: C.ink,
+      color: C.paper,
+      padding: '8px 16px 4px',
+      borderRadius: 10,
+    })}
+  >
+    {children}
+  </div>
+)
+
+export async function ogCard(body: ReactNode, url = 'fryranker.com') {
+  return new ImageResponse(
+    <div
+      style={flex({
+        width: '100%',
+        height: '100%',
+        flexDirection: 'column',
+        background: C.paper,
+        color: C.ink,
+        fontFamily: 'Archivo',
+      })}
+    >
+      <Checker />
+      <div style={flex({ flex: 1, alignItems: 'center', padding: '28px 64px 0' })}>{body}</div>
+      <div
+        style={flex({
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 64px 40px',
+        })}
+      >
+        <Logo />
+        <div style={{ fontSize: 28, fontWeight: 800, color: C.soft }}>{url}</div>
+      </div>
+    </div>,
+    { ...OG_SIZE, fonts: await loadFonts() }
+  )
+}
+
+/** The L1 sign as a square app icon: mustard "FR" on the red sign. */
+export async function monogram(size: number) {
+  return new ImageResponse(
+    <div
+      style={cond(size * 0.52, {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: size * 0.06,
+        background: C.red,
+        color: C.mustard,
+        letterSpacing: '-0.01em',
+      })}
+    >
+      FR
+    </div>,
+    { width: size, height: size, fonts: await loadFonts() }
   )
 }

@@ -4,16 +4,15 @@ export const metadata = { title: 'Not found', robots: { index: false } }
 
 export default function NotFound() {
   return (
-    <main className="wrap page">
-      <header className="item-hero">
-        <div className="item-emoji" aria-hidden>
-          🍟
-        </div>
-        <h1>That page fell under the seat</h1>
-        <p className="subtitle">We couldn&apos;t find what you were looking for.</p>
+    <main className="page">
+      <header className="share-hero">
+        <h1 className="cond">
+          Order <span>not found</span>
+        </h1>
+        <p>That page fell under the seat. Let&apos;s get you back to the counter.</p>
       </header>
-      <div className="cta-row">
-        <Link className="share-btn" href="/">
+      <div className="row-actions">
+        <Link className="btn primary" href="/">
           Back to the rankings
         </Link>
       </div>

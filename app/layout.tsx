@@ -1,23 +1,17 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-import localFont from 'next/font/local'
+import { Archivo } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import CategoryNav from '@/components/CategoryNav'
 import JsonLd from '@/components/JsonLd'
+import SiteFooter from '@/components/SiteFooter'
+import SiteHeader from '@/components/SiteHeader'
 import { site } from '@/lib/site'
 import './globals.css'
 
-const heavitas = localFont({
-  src: '../assets/Heavitas.ttf',
-  variable: '--font-display',
-  display: 'swap',
-})
-
-const inter = Inter({
+const archivo = Archivo({
   subsets: ['latin'],
-  weight: ['400', '600', '700', '800', '900'],
-  variable: '--font-body',
+  axes: ['wdth'],
+  variable: '--font-archivo',
   display: 'swap',
 })
 
@@ -40,20 +34,18 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fdfbf7' },
-    { media: '(prefers-color-scheme: dark)', color: '#1a1a1a' },
+    { media: '(prefers-color-scheme: light)', color: '#fff6e5' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a120c' },
   ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${heavitas.variable} ${inter.variable}`}>
+    <html lang="en" className={archivo.variable}>
       <body>
-        <CategoryNav />
+        <SiteHeader />
         {children}
-        <footer className="footer">
-          <p>{site.credit}</p>
-        </footer>
+        <SiteFooter />
         <JsonLd
           data={{
             '@context': 'https://schema.org',

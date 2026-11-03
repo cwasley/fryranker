@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import Barcode from '@/components/Barcode'
 import { getCategory, itemPath } from '@/lib/categories'
 import { parseShare } from '@/lib/share'
 import { getStandings } from '@/lib/standings'
@@ -24,7 +25,7 @@ async function load(params: Params) {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { category, picks } = await load(params)
   const title = `My top 5 ${category.many}`
-  const description = `${list(picks.map((item) => item.name))}. What's your #1? Rank ${category.plural} head to head on FryRanker.`
+  const description = `${list(picks.map((item) => item.name))}. What's yours? Pick between two ${category.many} at a time on FryRanker.`
   return {
     title,
     description,
@@ -39,40 +40,36 @@ export default async function SharePage({ params }: { params: Params }) {
   const { items } = await getStandings(category)
 
   return (
-    <main className="wrap page">
-      <header className="item-hero">
-        <div className="item-emoji" aria-hidden>
-          {picks[0].emoji}
-        </div>
-        <h1>My top 5 {category.many}</h1>
-        <p className="subtitle">Picked one head-to-head matchup at a time on FryRanker.</p>
+    <main className="page">
+      <header className="share-hero">
+        <h1 className="cond">
+          What&apos;s <span>yours?</span>
+        </h1>
+        <p>
+          Someone sent you their order. Pick between two {category.many} at a time to make your own.
+        </p>
       </header>
-
-      <ol className="share-list">
-        {picks.map((item, i) => {
-          const global = items.find((entry) => entry.id === item.id)
-          return (
+      <div className="receipt">
+        <h2 className="cond">My top 5 {category.many}</h2>
+        <p className="meta">FryRanker · {category.navLabel}</p>
+        <hr />
+        <ol>
+          {picks.map((item) => (
             <li key={item.id}>
-              <Link href={itemPath(category, item)} className="fry-row">
-                <span className="row-left">
-                  <span className="rank-number">{i + 1}</span>
-                  <span className="info">
-                    <span className="info-name">
-                      {item.emoji} {item.name}
-                    </span>
-                    <span className="info-meta">{item.kind}</span>
-                  </span>
-                </span>
-                {global && <span className="score-badge">Global #{global.rank}</span>}
-              </Link>
+              <Link href={itemPath(category, item)}>{item.name}</Link>
+              <span className="crowd-rank">
+                Crowd #{items.find((entry) => entry.id === item.id)?.rank}
+              </span>
             </li>
-          )
-        })}
-      </ol>
-
-      <div className="cta-row">
-        <Link className="share-btn" href={category.home}>
-          {category.emoji} Rank your own
+          ))}
+        </ol>
+        <hr />
+        <p className="thanks">Thank you, come again</p>
+        <Barcode />
+      </div>
+      <div className="row-actions">
+        <Link className="btn primary" href={category.home}>
+          Rank your own
         </Link>
       </div>
     </main>

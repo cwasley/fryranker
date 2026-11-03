@@ -38,7 +38,9 @@ yarn dev
   - `/fries/<slug>`, `/sauces/<slug>`: one page per item with its rank and head-to-head odds
   - `/fries/<a>/vs/<b>`: matchup pages, rendered on first visit. They stay `noindex` until a pair has 10 direct votes
   - `/top/<category>/<ids>`: the share link for someone's personal top 5 (`noindex`)
+  - `/how-it-works`: how points and percentages are worked out
+- **Rounds**: picks come 10 at a time. Each pick shows how the crowd sees that matchup (`lib/reveal.ts`: the pair's own split once it has 10 direct votes, the rankings' prediction before that), and each round ends in a receipt with the visitor's top 5 and a share link.
 - **Taste profiles** stay in the visitor's `localStorage` and never reach the server.
 - **Link previews** are generated per page (`opengraph-image.tsx`) from `lib/og.tsx`.
 - **SEO**: `sitemap.ts` and `robots.ts` build from the data. Every page sets a canonical URL on `fryranker.com`, and the pages carry JSON-LD (WebSite, ItemList, BreadcrumbList).
-- **Theme**: follows the system light or dark setting.
+- **Design**: the "Drive-Thru" system in `app/globals.css`, with drawn glyphs from `lib/glyphs.ts` instead of emoji. Follows the system light or dark setting. Archivo is OFL-licensed; the static TTFs the preview cards need are in `assets/fonts/` with the license.

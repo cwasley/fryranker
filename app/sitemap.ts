@@ -6,7 +6,9 @@ import { getMatchups, INDEXABLE_MATCHUP_VOTES } from '@/lib/standings'
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const entries: MetadataRoute.Sitemap = []
+  const entries: MetadataRoute.Sitemap = [
+    { url: absoluteUrl('/how-it-works'), changeFrequency: 'yearly', priority: 0.3 },
+  ]
   for (const category of categoryList) {
     entries.push({ url: absoluteUrl(category.home), changeFrequency: 'hourly', priority: 1 })
     for (const item of category.items) {

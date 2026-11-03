@@ -7,7 +7,8 @@ export type Item = {
   fullName: string
   /** Fry style or the sauce's restaurant. */
   kind: string
-  emoji: string
+  /** Sauce color for its dipping-cup glyph. */
+  color?: string
   tags: string[]
   note: string
 }
