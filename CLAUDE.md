@@ -25,3 +25,4 @@
 - Mobile-first CSS: base styles target phones, `min-width` queries widen.
 - Colors come from the tokens at the top of `app/globals.css`, each redefined under `prefers-color-scheme: dark`. No theme toggle; the system setting wins.
 - Before pushing: `yarn lint`, `yarn typecheck`, `yarn build`. `main` auto-deploys to production.
+- Keep `vercel.json`. The Vercel project's Framework Preset isn't Next.js, so this file's `"framework": "nextjs"` is what makes the build work; without it the deploy fails looking for a `public` output directory.
