@@ -8,6 +8,7 @@ import { findItem, getCategory, itemPath, matchupPath } from '@/lib/categories'
 import { source, split } from '@/lib/reveal'
 import { getMatchups, getStandings, INDEXABLE_MATCHUP_VOTES, type Ranked } from '@/lib/standings'
 import { formatCount } from '@/lib/text'
+import { social } from '@/lib/metadata'
 
 export const revalidate = 600
 
@@ -56,8 +57,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title,
     description,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical },
-    twitter: { title, description },
+    ...social(title, description, canonical),
     robots: s.votes >= INDEXABLE_MATCHUP_VOTES ? undefined : { index: false, follow: true },
   }
 }

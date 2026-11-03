@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import JsonLd from '@/components/JsonLd'
 import SiteFooter from '@/components/SiteFooter'
 import SiteHeader from '@/components/SiteHeader'
+import { social } from '@/lib/metadata'
 import { site } from '@/lib/site'
 import './globals.css'
 
@@ -23,12 +24,7 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    siteName: site.name,
-  },
-  twitter: { card: 'summary_large_image' },
+  ...social(`${site.name} | The Definitive Fry Rankings`, site.description),
   appleWebApp: { title: site.name, statusBarStyle: 'default' },
 }
 

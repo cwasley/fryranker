@@ -7,6 +7,7 @@ import { itemPath, type Category } from '@/lib/categories'
 import { absoluteUrl, site } from '@/lib/site'
 import { getMatchups, getStandings } from '@/lib/standings'
 import { formatCount, list, roundedCount, titleCase } from '@/lib/text'
+import { social } from '@/lib/metadata'
 
 export async function rankerMetadata(category: Category): Promise<Metadata> {
   const { items, totalVotes } = await getStandings(category)
@@ -17,8 +18,7 @@ export async function rankerMetadata(category: Category): Promise<Metadata> {
     title: { absolute: title },
     description,
     alternates: { canonical: category.home },
-    openGraph: { title, description, url: category.home },
-    twitter: { title, description },
+    ...social(title, description, category.home),
   }
 }
 

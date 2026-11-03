@@ -6,6 +6,7 @@ import { getCategory, itemPath } from '@/lib/categories'
 import { parseShare } from '@/lib/share'
 import { getStandings } from '@/lib/standings'
 import { list } from '@/lib/text'
+import { social } from '@/lib/metadata'
 
 export const revalidate = 3600
 
@@ -29,8 +30,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     title,
     description,
-    openGraph: { title, description },
-    twitter: { title, description },
+    ...social(title, description),
     robots: { index: false, follow: true },
   }
 }

@@ -8,6 +8,7 @@ import { categoryList, findItem, getCategory, itemPath, matchupPath } from '@/li
 import { DIRECT_VOTES, split } from '@/lib/reveal'
 import { getMatchups, getStandings } from '@/lib/standings'
 import { formatCount, titleCase } from '@/lib/text'
+import { social } from '@/lib/metadata'
 
 export const revalidate = 600
 export const dynamicParams = false
@@ -38,8 +39,7 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { title, description, url: path },
-    twitter: { title, description },
+    ...social(title, description, path),
   }
 }
 

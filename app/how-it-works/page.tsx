@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { social } from '@/lib/metadata'
 import { DIRECT_VOTES } from '@/lib/reveal'
 
 export const metadata: Metadata = {
@@ -7,6 +8,11 @@ export const metadata: Metadata = {
   description:
     'FryRanker ranks fast food fries and sauces with head-to-head votes and Elo ratings, the system chess uses. Here is how a vote moves the standings.',
   alternates: { canonical: '/how-it-works' },
+  ...social(
+    'How the Rankings Work | FryRanker',
+    'How a head-to-head vote moves the FryRanker standings.',
+    '/how-it-works'
+  ),
 }
 
 export default function HowItWorks() {
