@@ -9,7 +9,6 @@ type Props = {
   items: Ranked[]
   title: string
   sub?: string
-  compact?: boolean
   className?: string
   children?: React.ReactNode
 }
@@ -19,7 +18,6 @@ export default function MenuBoard({
   items,
   title,
   sub,
-  compact,
   className = '',
   children,
 }: Props) {
@@ -44,13 +42,11 @@ export default function MenuBoard({
               </span>
               <span className="sc cond">
                 {item.score}
-                {!compact && <small>pts</small>}
+                <small>pts</small>
               </span>
-              {!compact && (
-                <span className="k">
-                  {item.kind} · {formatCount(item.battles)} votes
-                </span>
-              )}
+              <span className="k">
+                {item.kind} · {formatCount(item.battles)} votes
+              </span>
             </Link>
           </li>
         ))}

@@ -34,25 +34,12 @@ export default async function RankerPage({ category }: { category: Category }) {
       <h1 className="sr-only">
         The best {category.plural}, ranked by {formatCount(totalVotes)} head-to-head votes
       </h1>
-      <div className="home">
-        <Ranker
-          categoryKey={category.key}
-          standings={items}
-          totalVotes={totalVotes}
-          matchups={matchups.rows}
-        />
-        <MenuBoard
-          category={category}
-          items={items.slice(0, 8)}
-          title="On the board"
-          compact
-          className="aside"
-        >
-          <a className="all" href="#menu">
-            Full menu →
-          </a>
-        </MenuBoard>
-      </div>
+      <Ranker
+        categoryKey={category.key}
+        standings={items}
+        totalVotes={totalVotes}
+        matchups={matchups.rows}
+      />
 
       <section id="menu" className="menu" aria-label={`All ${category.plural}`}>
         <div className="menu-wrap">
