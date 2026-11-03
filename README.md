@@ -1,6 +1,6 @@
 # FryRanker
 
-The definitive fast food fry (and sauce) rankings, decided one head-to-head vote at a time. Live at [www.fryranker.com](https://www.fryranker.com).
+The definitive fast food fry (and sauce) rankings, decided one head-to-head vote at a time. Live at [fryranker.com](https://fryranker.com).
 
 ## Stack
 
@@ -40,5 +40,5 @@ yarn dev
   - `/top/<category>/<ids>`: the share link for someone's personal top 5 (`noindex`)
 - **Taste profiles** stay in the visitor's `localStorage` and never reach the server.
 - **Link previews** are generated per page (`opengraph-image.tsx`) from `lib/og.tsx`.
-- **SEO**: `sitemap.ts` and `robots.ts` build from the data. Every page sets a canonical URL on `www.fryranker.com`, and the pages carry JSON-LD (WebSite, ItemList, BreadcrumbList).
+- **SEO**: `sitemap.ts` and `robots.ts` build from the data. Every page sets a canonical URL on `fryranker.com`, and the pages carry JSON-LD (WebSite, ItemList, BreadcrumbList).
 - **Theme**: follows the system light or dark setting.
