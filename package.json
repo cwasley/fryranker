@@ -6,28 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "format": "prettier --write \"app/**/*.{ts,tsx,js,jsx,css}\" \"scripts/**/*.ts\"",
-    "db:init": "tsx scripts/init-db.ts",
-    "db:init-sauces": "tsx scripts/init-sauces-db.ts"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:setup": "tsx --env-file=.env.local scripts/setup-db.ts"
   },
   "dependencies": {
-    "@vercel/analytics": "^1.6.1",
-    "@vercel/postgres": "^0.10.0",
-    "next": "^14.2.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@neondatabase/serverless": "^1.2.0",
+    "@vercel/analytics": "^2",
+    "@vercel/speed-insights": "^2",
+    "next": "16.4.4",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "dotenv": "^17.2.3",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.0",
-    "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.7.4",
-    "tsx": "^4.7.0",
-    "typescript": "^5.0.0"
+    "@types/node": "^24",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.4",
+    "eslint-config-prettier": "^10",
+    "prettier": "^3",
+    "tsx": "^4",
+    "typescript": "~6.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

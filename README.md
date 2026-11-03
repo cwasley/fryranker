@@ -1,77 +1,44 @@
 # FryRanker
 
-The Definitive Fry Rankings - A fun web app to rank your favorite fast food fries through head-to-head matchups.
+The definitive fast food fry (and sauce) rankings, decided one head-to-head vote at a time. Live at [www.fryranker.com](https://www.fryranker.com).
 
-## Tech Stack
+## Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Database**: Vercel Postgres
-- **Styling**: CSS with CSS Variables
+- Next.js 16 App Router, React 19, TypeScript, plain CSS (`app/globals.css`)
+- Neon Postgres through `@neondatabase/serverless`
+- Vercel hosting, Web Analytics and Speed Insights (both cookieless)
 
-## Features
-
-- 🍟 Head-to-head fry matchups
-- 📊 ELO-based ranking system
-- 🌍 **Global leaderboard** - see what everyone thinks
-- 🧠 **Personal taste profile** - track your own preferences (stored locally)
-- ⌨️ Keyboard shortcuts (← → to vote, Space to skip)
-- 📱 Responsive design
-
-## Getting Started
-
-### 1. Install dependencies
+## Getting started
 
 ```bash
-npm install
+yarn
+vercel env pull .env.local   # DATABASE_URL and friends
+yarn dev
 ```
 
-### 2. Set up Vercel Postgres
+`.env.local` points at the production database: there is only one. Votes cast from `yarn dev` count.
 
-1. Go to your [Vercel Dashboard](https://vercel.com/dashboard)
-2. Select your project → **Storage** tab
-3. Click **Create Database** → **Postgres**
-4. Name it (e.g., `fryranker-db`) and create
-5. Go to the `.env.local` tab and copy the environment variables
-6. Create a `.env.local` file in your project root and paste them
+## Scripts
 
-Your `.env.local` should look like:
-```
-POSTGRES_URL="postgres://..."
-POSTGRES_PRISMA_URL="postgres://..."
-POSTGRES_URL_NO_SSL="postgres://..."
-POSTGRES_URL_NON_POOLING="postgres://..."
-POSTGRES_USER="..."
-POSTGRES_HOST="..."
-POSTGRES_PASSWORD="..."
-POSTGRES_DATABASE="..."
-```
+| Command          | What it does                                                       |
+| ---------------- | ------------------------------------------------------------------ |
+| `yarn dev`       | Dev server                                                         |
+| `yarn build`     | Production build (reads standings from the database)               |
+| `yarn lint`      | ESLint                                                             |
+| `yarn typecheck` | Route types plus `tsc`                                             |
+| `yarn format`    | Prettier                                                           |
+| `yarn db:setup`  | Creates any missing tables and adds rows for new items. Idempotent |
 
-### 3. Initialize the database
+## How it works
 
-```bash
-npm run db:init
-```
-
-This creates the `fries` table and populates it with initial data.
-
-### 4. Run development server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Deployment
-
-1. Push to GitHub
-2. Import to Vercel
-3. The database will automatically connect (env vars are already set)
-4. After first deploy, run `npm run db:init` with your Vercel env vars to initialize the database
-
-## How It Works
-
-- **Global Standings**: Stored in Vercel Postgres. Every vote updates the global ELO scores.
-- **Your Taste Profile**: Stored in localStorage. Tracks your personal preferences separately from the global rankings.
-
+- **Items** live in `lib/data/fries.ts` and `lib/data/sauces.ts`. `lib/categories.ts` describes each category (table, URLs, copy, taste-profile thresholds).
+- **Votes** go to `POST /api/vote` (fries) or `POST /api/sauces/vote`. One transaction logs the vote, updates both Elo scores, and bumps the pair's head-to-head record in `matchups`. Each visitor is limited to 30 votes a minute.
+- **Pages** are statically rendered and refreshed in the background (ISR):
+  - `/` and `/sauces`: the ranker and global standings
+  - `/fries/<slug>`, `/sauces/<slug>`: one page per item with its rank and head-to-head odds
+  - `/fries/<a>/vs/<b>`: matchup pages, rendered on first visit. They stay `noindex` until a pair has 10 direct votes
+  - `/top/<category>/<ids>`: the share link for someone's personal top 5 (`noindex`)
+- **Taste profiles** stay in the visitor's `localStorage` and never reach the server.
+- **Link previews** are generated per page (`opengraph-image.tsx`) from `lib/og.tsx`.
+- **SEO**: `sitemap.ts` and `robots.ts` build from the data. Every page sets a canonical URL on `www.fryranker.com`, and the pages carry JSON-LD (WebSite, ItemList, BreadcrumbList).
+- **Theme**: follows the system light or dark setting.

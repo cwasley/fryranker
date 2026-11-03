@@ -1,0 +1,168 @@
+import { fries } from './data/fries'
+import { sauces } from './data/sauces'
+import type { Item } from './items'
+
+export type Insight = { label: string; value: string; hint: string }
+
+export type Category = {
+  key: 'fries' | 'sauces'
+  /** Postgres table holding each item's score and battle count. */
+  table: 'fries' | 'sauces'
+  items: Item[]
+  /** Where the ranker lives. */
+  home: string
+  /** Prefix for item, matchup and share pages. */
+  base: string
+  brand: [string, string]
+  tagline: string
+  navLabel: string
+  emoji: string
+  one: string
+  many: string
+  /** "fast food fries": the phrase people search for. */
+  plural: string
+  kindLabel: string
+  voteApi: string
+  storageKey: string
+  /** Comparisons needed before the taste profile takes shape, unlocks and locks. */
+  thresholds: { shape: number; reveal: number; lock: number }
+  spicy: RegExp
+  insights: (top: Item[]) => Insight[]
+  matchupTitle: (a: Item, b: Item) => string
+}
+
+const countMatches = (items: Item[], pattern: RegExp) =>
+  items.filter((item) => item.tags.some((tag) => pattern.test(tag))).length
+
+const leading = (counts: Map<string, number>, fallback: string) => {
+  let best = fallback
+  let bestCount = 0
+  for (const [key, count] of counts) {
+    if (count > bestCount) {
+      best = key
+      bestCount = count
+    }
+  }
+  return best
+}
+
+const styleBucket = (style: string) => {
+  const s = style.toLowerCase()
+  if (s.includes('waffle')) return 'Waffle'
+  if (s.includes('curly')) return 'Curly'
+  if (s.includes('wedge')) return 'Wedges'
+  if (s.includes('tots')) return 'Tots'
+  if (s.includes('crinkle')) return 'Crinkle'
+  if (s.includes('shoestring') || s.includes('thin')) return 'Shoestring'
+  if (s.includes('thick') || s.includes('boardwalk')) return 'Thick Cut'
+  if (s.includes('fresh')) return 'Fresh Cut'
+  return 'Classic'
+}
+
+const fryInsights = (top: Item[]): Insight[] => {
+  const styles = new Map<string, number>()
+  for (const item of top) {
+    const bucket = styleBucket(item.kind)
+    styles.set(bucket, (styles.get(bucket) ?? 0) + 1)
+  }
+  const spice = countMatches(top, /spice|cajun|nacho|pepper|heat|cumin|max seasoning/i)
+  const crunch = countMatches(top, /crisp|crispy|snappy|crunch|shell|edges/i)
+  const soft = countMatches(top, /soft|fluffy|plush|melt/i)
+  return [
+    {
+      label: 'Texture',
+      value:
+        crunch > soft
+          ? 'Crunch-chaser'
+          : soft > crunch
+            ? 'Soft-center loyalist'
+            : 'Texture-agnostic',
+      hint: 'Crunch vs soft',
+    },
+    {
+      label: 'Seasoning',
+      value: spice >= 3 ? 'Seasoning-forward' : spice === 2 ? 'Balanced' : 'Clean + classic',
+      hint: 'Based on winners',
+    },
+    { label: 'Style lane', value: leading(styles, 'Mixed bag'), hint: 'Top 5 trend' },
+  ]
+}
+
+const sauceInsights = (top: Item[]): Insight[] => {
+  const heat = countMatches(top, /spice|spicy|heat|hot|fire|diablo|cajun/i)
+  const creamy = countMatches(top, /creamy|mayo|ranch/i)
+  const tangy = countMatches(top, /tangy|vinegar|mustard|sweet/i)
+  return [
+    {
+      label: 'Texture',
+      value: creamy > tangy ? 'Creamy lover' : tangy > creamy ? 'Tangy fan' : 'Texture-agnostic',
+      hint: 'Creamy vs tangy',
+    },
+    {
+      label: 'Heat level',
+      value: heat >= 3 ? 'Heat-seeker' : heat === 2 ? 'Balanced' : 'Mild & creamy',
+      hint: 'Based on winners',
+    },
+  ]
+}
+
+export const categories: Record<Category['key'], Category> = {
+  fries: {
+    key: 'fries',
+    table: 'fries',
+    items: fries,
+    home: '/',
+    base: '/fries',
+    brand: ['Fry', 'Ranker'],
+    tagline: 'The Definitive Fry Rankings',
+    navLabel: 'Fries',
+    emoji: '🍟',
+    one: 'fry',
+    many: 'fries',
+    plural: 'fast food fries',
+    kindLabel: 'Style',
+    voteApi: '/api/vote',
+    storageKey: 'fryranker',
+    thresholds: { shape: 8, reveal: 18, lock: 36 },
+    spicy: /spice|cajun|nacho|pepper|heat|cumin|garlic/i,
+    insights: fryInsights,
+    matchupTitle: (a, b) => `${a.name} vs ${b.name} Fries`,
+  },
+  sauces: {
+    key: 'sauces',
+    table: 'sauces',
+    items: sauces,
+    home: '/sauces',
+    base: '/sauces',
+    brand: ['Sauce', 'Ranker'],
+    tagline: 'The Definitive Sauce Rankings',
+    navLabel: 'Sauces',
+    emoji: '🌶️',
+    one: 'sauce',
+    many: 'sauces',
+    plural: 'fast food sauces',
+    kindLabel: 'From',
+    voteApi: '/api/sauces/vote',
+    storageKey: 'sauceranker',
+    thresholds: { shape: 6, reveal: 12, lock: 24 },
+    spicy: /spice|spicy|heat|hot|cajun|pepper|fire/i,
+    insights: sauceInsights,
+    matchupTitle: (a, b) => `${a.fullName} vs ${b.fullName}`,
+  },
+}
+
+export const categoryList = Object.values(categories)
+
+export const getCategory = (key: string): Category | undefined =>
+  Object.hasOwn(categories, key) ? categories[key as Category['key']] : undefined
+
+export const itemPath = (category: Category, item: Item) => `${category.base}/${item.slug}`
+
+/** Matchup pages list the pair in slug order so each pair has one URL. */
+export const matchupPath = (category: Category, a: Item, b: Item) => {
+  const [first, second] = a.slug < b.slug ? [a, b] : [b, a]
+  return `${category.base}/${first.slug}/vs/${second.slug}`
+}
+
+export const findItem = (category: Category, slug: string) =>
+  category.items.find((item) => item.slug === slug)
