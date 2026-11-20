@@ -46,7 +46,7 @@ export const localFries: Item[] = [
     name: "Max & Helen's",
     fullName: "Max & Helen's Fries",
     kind: 'Battered',
-    tags: ['Beef tallow', 'Battered', 'Craggy crunch', 'Fluffy inside'],
+    tags: ['Beef tallow', 'Diner fries', 'Craggy crunch', 'Fluffy inside'],
     note: 'Battered, craggy fries in beef tallow. Diner fries, turned all the way up.',
     ...la({ neighborhood: 'Larchmont', address: '127 N Larchmont Blvd, Los Angeles, CA 90004' }),
   },
