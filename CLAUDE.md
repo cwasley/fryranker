@@ -11,9 +11,15 @@
 - Item `slug`s are public URLs (item, matchup and share pages). Never change a shipped slug. If one must change, add a permanent redirect in `next.config.ts`.
 - Adding an item: append it to `lib/data/*.ts`. Every Vercel build runs `scripts/setup-db.ts` first against that environment's database (previews: test, production: production), which inserts its row. Locally, `yarn db:setup` does the same for the test database.
 - Production uses `DATABASE_URL`; preview deploys and local dev use `TEST_DATABASE_URL` (the Neon `preview` branch). `lib/database-url.ts` picks by `VERCEL_ENV` and must never fall back to `DATABASE_URL` outside production: the Neon integration sets `DATABASE_URL` for every environment, so a fallback would point testing at the real votes. Never script votes against production.
-- The `preview` git branch deploys to preview.fryranker.com, which `robots.ts` keeps out of search.
 - Head-to-head records (`matchups`) start in November 2026. Older votes only moved Elo scores, so pages must not present records as all-time.
 - Never seed fake votes or matchups. Until a pair has `DIRECT_VOTES` real votes, its split comes from the rankings (`lib/reveal.ts`), and the copy says so ("The rankings back you", "Based on all N votes").
+
+## Branches and releases
+
+- Day-to-day work goes on the `preview` git branch, never `main`. Pull first (`git pull --rebase origin preview`), then commit and push. preview.fryranker.com (test database, kept out of search by `robots.ts`) updates about a minute later. Max and Collin both push to `preview`, so never force-push it.
+- Only Collin moves `main`, about once a week, by fast-forwarding it to `preview` (`git push origin preview:main`). Don't squash or rebase that release: `preview` must keep sharing history with `main`, or every later release conflicts.
+- Before a release, rehearse its database changes on fresh data: in the Neon console use "Reset from parent" on the `preview` branch, redeploy `preview`, and read the setup lines at the top of its build log. The production build runs the same setup against the real database.
+- The Vercel account is on the Hobby plan, so Max can't be a member or open build logs. A failed build shows as a red check on the commit in GitHub; Collin sends the log.
 
 ## Rendering
 
