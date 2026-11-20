@@ -18,6 +18,7 @@
 
 - Day-to-day work goes on the `preview` git branch, never `main`. Pull first (`git pull --rebase origin preview`), then commit and push. preview.fryranker.com (test database, kept out of search by `robots.ts`) updates about a minute later. Max and Collin both push to `preview`, so never force-push it.
 - Only Collin moves `main`, about once a week, by fast-forwarding it to `preview` (`git push origin preview:main`). Don't squash or rebase that release: `preview` must keep sharing history with `main`, or every later release conflicts.
+- `preview` is GitHub's default branch, so Dependabot's security PRs target it. Merge them into `preview` like any other change; nothing merges into `main` directly. Vercel's production branch is still `main`.
 - Before a release, rehearse its database changes on fresh data: in the Neon console use "Reset from parent" on the `preview` branch, redeploy `preview`, and read the setup lines at the top of its build log. The production build runs the same setup against the real database.
 - The Vercel account is on the Hobby plan, so Max can't be a member or open build logs. A failed build shows as a red check on the commit in GitHub; Collin sends the log.
 
