@@ -56,6 +56,12 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 - **Sponsorship** (a chain sponsoring Fry Madness or a featured matchup) is likely the best fit for the site. It needs traffic numbers to pitch, so it comes after 7, 8 and 11.
 - **Display ads**: not recommended at this size. They'd earn very little and clutter the look we just built.
 
+## Local spots, next steps (not scored yet)
+
+- LA launched on `preview` with 10 hand-checked spots (Nov 2026). Next: let visitors add spots through a places search (needs a Foursquare or Google Places account), then more cities.
+- Nearby discovery: recommend spots on the visitor's city board that match their taste profile.
+- Re-check the LA list every few months; spots close.
+
 ## Housekeeping (not scored)
 
 - Once the `items` switch has been live for a week with no rollback: `DROP TRIGGER mirror_to_items ON fries; DROP TRIGGER mirror_to_items ON sauces; DROP FUNCTION mirror_legacy_scores(); DROP TABLE fries, sauces;` and remove the copy step and `LEGACY_KIND_COLUMN` from `lib/schema.ts`.

@@ -53,6 +53,7 @@ Every Vercel build runs `scripts/setup-db.ts` first. It picks the database by `V
   - `/top/<category>/<ids>`: the share link for someone's personal top 5 (`noindex`)
   - `/how-it-works`: how points and percentages are worked out
 - **Rounds**: picks come 10 at a time. Each pick shows how the crowd sees that matchup (`lib/reveal.ts`: the pair's own split once it has 10 direct votes, the rankings' prediction before that), and each round ends in a receipt with the visitor's top 5 and a share link.
+- **Local spots** live in `lib/data/local/` with a `city` (from `lib/cities.ts`) and a `place`. The national board stays chains only; `/fries/in/<city>` ranks the chains plus that city's spots on the same points scale, and every matchup there includes a local. "Never had X" skips a pair without voting and is remembered on the device. The home page links visitors to their city board when Vercel's IP location puts them inside its radius (`/api/where`; nothing is stored).
 - **Taste profiles** stay in the visitor's `localStorage` and never reach the server.
 - **Link previews** are generated per page (`opengraph-image.tsx`) from `lib/og.tsx`.
 - **SEO**: `sitemap.ts` and `robots.ts` build from the data. Every page sets a canonical URL on `fryranker.com`, and the pages carry JSON-LD (WebSite, ItemList, BreadcrumbList).
