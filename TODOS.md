@@ -59,6 +59,4 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 ## Housekeeping (not scored)
 
 - Once the `items` switch has been live for a week with no rollback: `DROP TRIGGER mirror_to_items ON fries; DROP TRIGGER mirror_to_items ON sauces; DROP FUNCTION mirror_legacy_scores(); DROP TABLE fries, sauces;` and remove the copy step and `LEGACY_KIND_COLUMN` from `lib/schema.ts`.
-
-- A separate Neon branch for development, so local testing never touches the production database.
 - Unit tests for `lib/reveal.ts`, `lib/share.ts` and the Elo math, plus a Playwright smoke test of a full round with the vote API stubbed out.
