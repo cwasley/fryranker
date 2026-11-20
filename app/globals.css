@@ -1997,8 +1997,11 @@ footer.foot a {
 }
 
 .daily-pick .disc {
-  width: 46px;
-  height: 46px;
+  width: 50px;
+  height: 50px;
+  padding: 5px;
+  border-width: 2px;
+  background: #ffbf1f;
   flex-shrink: 0;
 }
 
