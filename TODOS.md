@@ -39,7 +39,7 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 6. **Desktop keyboard shortcuts.** ← and → to pick, space for "Too close to call". The old site had these before the mobile-first pass.
 7. **Search copy on the home page.** A short, visible intro ("36,000 votes say McDonald's has the best fast food fries…"), a small FAQ ("Who has the best fast food fries?"), and a refreshed date. The menu board is already in the HTML; this gives search engines a summary to quote.
 8. **Daily matchup and streaks.** One featured pair a day for everyone, with yesterday's result shown, plus a streak counter kept on the device. It's the strongest reason to come back daily, Wordle-style.
-9. **Share the receipt as an image.** Share the receipt PNG itself (Web Share with files) in story size, so it works on Instagram and TikTok, not just in texts.
+9. **Share the receipt as an image.** Done on `preview` (Nov 2026): "Share as image" on the receipt shares `/top/<category>/<ids>/story`, a 1080×1920 PNG. Still to check on a real iPhone and Android phone that the share sheet attaches it.
 10. **Rank movement arrows.** "▲2 this week" on the menu board, computed from the `votes` log. Needs about two weeks of votes first.
 11. **Fry Madness bracket.** A March bracket event with rounds that open each day. It's a seasonal traffic spike, and a natural first thing to sponsor (see Money).
 12. **Burgers category.** Most of the system is already generic: add `lib/data/burgers.ts`, a glyph set, a table and a nav tab. Consider moving scores into one `items` table keyed by category first, so new categories don't each need their own table. After burgers: nuggets, chicken sandwiches, shakes.
