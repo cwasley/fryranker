@@ -15,9 +15,10 @@ import { eloDelta, GLOBAL_K } from '@/lib/elo'
 import { isLocal, type Item } from '@/lib/items'
 import { badge, isHotTake, split, verdict, type Split } from '@/lib/reveal'
 import { sharePath } from '@/lib/share'
-import type { MatchupRow, Ranked } from '@/lib/standings'
+import { rankLabel, type MatchupRow, type Ranked } from '@/lib/standings'
 import { rankedTaste, useTaste } from '@/lib/taste'
 import { list } from '@/lib/text'
+import { readIds, SPOTS_EVENT, visitorKeys } from '@/lib/visitor'
 import Barcode from './Barcode'
 import Disc from './Disc'
 import Name from './Name'
@@ -69,33 +70,74 @@ function pairFromUrl(pool: Item[], skip: Set<number>, cityBoard: boolean): Pair 
   return randomPair(pool, skip, cityBoard, a ?? b ?? only)
 }
 
-/** Items this visitor has said they've never had. Kept on the device, like the taste profile. */
-function useUntried(category: Category) {
-  const key = `${category.storageKey}_untried`
-  const [untried, setUntried] = useState<Set<number>>(() => new Set())
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(key) ?? '[]') as number[]
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (saved.length) setUntried(new Set(saved))
-    } catch {
-      // Storage blocked or unreadable: start empty.
-    }
-  }, [key])
-  const save = (next: Set<number>) => {
-    setUntried(next)
-    try {
-      localStorage.setItem(key, JSON.stringify([...next]))
-    } catch {
-      // Storage blocked: remember for this visit only.
-    }
+const writeIds = (key: string, ids: Set<number>) => {
+  try {
+    localStorage.setItem(key, JSON.stringify([...ids]))
+  } catch {
+    // Storage blocked: remember for this visit only.
   }
+  window.dispatchEvent(new Event(SPOTS_EVENT))
+}
+
+/**
+ * What the visitor has and hasn't had, kept on the device like the taste profile. `been` is null
+ * until they answer the checklist; after that, local spots they didn't check are skipped.
+ */
+function useSpots(category: Category) {
+  const { untried: untriedKey, been: beenKey } = visitorKeys(category)
+  const [untried, setUntried] = useState<Set<number>>(() => new Set())
+  const [been, setBeen] = useState<Set<number> | null>(null)
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    // Storage is only readable after hydration.
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setUntried(readIds(untriedKey) ?? new Set())
+    setBeen(readIds(beenKey))
+    setReady(true)
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [untriedKey, beenKey])
+
+  const save = (nextUntried: Set<number>, nextBeen: Set<number> | null) => {
+    setUntried(nextUntried)
+    setBeen(nextBeen)
+    writeIds(untriedKey, nextUntried)
+    if (nextBeen) writeIds(beenKey, nextBeen)
+  }
+  const without = (ids: Set<number>, id: number) => new Set([...ids].filter((x) => x !== id))
+
   return {
+    /** Storage has been read; until then, don't pick a matchup or show the checklist. */
+    ready,
     untried,
-    add: (id: number) => save(new Set([...untried, id])),
-    clear: () => save(new Set()),
+    been,
+    /** "Never had X". */
+    neverHad: (id: number) => save(new Set([...untried, id]), been && without(been, id)),
+    /** Checks or unchecks a spot on the checklist. */
+    toggle: (id: number) => {
+      const current = been ?? new Set<number>()
+      return current.has(id)
+        ? save(untried, without(current, id))
+        : save(without(untried, id), new Set([...current, id]))
+    },
+    /** Saves the checklist as answered, even with nothing checked. */
+    answer: () => save(untried, been ?? new Set()),
+    clear: () => {
+      save(new Set(), null)
+      try {
+        localStorage.removeItem(beenKey)
+      } catch {
+        // Nothing to clear.
+      }
+      window.dispatchEvent(new Event(SPOTS_EVENT))
+    },
   }
 }
+
+/** Skip anything marked "Never had", and once the checklist is answered, every unchecked spot. */
+const skipSet = (locals: Item[], untried: Set<number>, been: Set<number> | null) =>
+  been
+    ? new Set([...untried, ...locals.filter((item) => !been.has(item.id)).map((item) => item.id)])
+    : untried
 
 /** On the national board, points visitors in a city with a board to it. */
 function NearBanner({ category }: { category: Category }) {
@@ -135,7 +177,10 @@ export default function Ranker({
   const category = categories[categoryKey]
   const cityBoard = cityKey !== undefined
   const { taste, record, reset } = useTaste(category)
-  const { untried, add: markUntried, clear: clearUntried } = useUntried(category)
+  const spots = useSpots(category)
+  const locals = useMemo(() => initial.filter(isLocal), [initial])
+  const skip = skipSet(locals, spots.untried, spots.been)
+  const [checklistOpen, setChecklistOpen] = useState(false)
   const [standings, setStandings] = useState(initial)
   const [pair, setPair] = useState<Pair | null>(null)
   const [picked, setPicked] = useState<{ index: 0 | 1; split: Split } | null>(null)
@@ -155,12 +200,14 @@ export default function Ranker({
   }, [matchups])
 
   useEffect(() => {
-    // The first matchup is random, so it can only be picked after hydration.
+    // The first matchup is random, so it can only be picked after hydration, and after the
+    // visitor's spots are read so it never shows one they've ruled out.
+    if (!spots.ready) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPair(pairFromUrl(initial, untried, cityBoard) ?? randomPair(initial, untried, cityBoard))
+    setPair(pairFromUrl(initial, skip, cityBoard) ?? randomPair(initial, skip, cityBoard))
     // Only on load: later pairs come from next().
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category])
+  }, [category, spots.ready])
 
   useEffect(() => {
     if (!rateLimited) return
@@ -176,14 +223,21 @@ export default function Ranker({
       })
     )
 
-  const next = (skip = untried) => {
+  const next = (without = skip) => {
     setPicked(null)
-    setPair(randomPair(initial, skip, cityBoard))
+    setPair(randomPair(initial, without, cityBoard))
   }
 
   const neverHad = (id: number) => {
-    markUntried(id)
-    next(new Set([...untried, id]))
+    spots.neverHad(id)
+    next(new Set([...skip, id]))
+  }
+
+  const closeChecklist = () => {
+    spots.answer()
+    setChecklistOpen(false)
+    const been = spots.been ?? new Set<number>()
+    next(skipSet(locals, spots.untried, been))
   }
 
   const vote = (index: 0 | 1, now: number) => {
@@ -240,7 +294,7 @@ export default function Ranker({
         }}
         onReset={() => {
           reset()
-          clearUntried()
+          spots.clear()
           setRound({ n: 1, picks: [] })
           next(new Set())
         }}
@@ -255,6 +309,16 @@ export default function Ranker({
   return (
     <div>
       {!cityBoard && <NearBanner category={category} />}
+      {cityBoard && spots.ready && (
+        <Checklist
+          locals={locals}
+          been={spots.been}
+          open={checklistOpen || spots.been === null}
+          onToggle={spots.toggle}
+          onOpen={() => setChecklistOpen(true)}
+          onDone={closeChecklist}
+        />
+      )}
       <div className="ticket">
         <div className="order">
           Order #{(totalVotes + cast + 1).toLocaleString('en-US')}
@@ -287,7 +351,7 @@ export default function Ranker({
               onClick={(event) => vote(index, event.timeStamp)}
               disabled={rateLimited}
             >
-              <span className="plate">#{item.rank}</span>
+              <span className="plate">{rankLabel(item)}</span>
               <Disc category={category} item={item} />
               <span>
                 <span className="name cond">
@@ -367,6 +431,59 @@ export default function Ranker({
         </button>
       </div>
     </div>
+  )
+}
+
+type ChecklistProps = {
+  locals: Item[]
+  been: Set<number> | null
+  open: boolean
+  onToggle: (id: number) => void
+  onOpen: () => void
+  onDone: () => void
+}
+
+/** "Which of these have you had?" Local matchups then stick to the spots the visitor checked. */
+function Checklist({ locals, been, open, onToggle, onOpen, onDone }: ChecklistProps) {
+  if (!open) {
+    const count = been?.size ?? 0
+    return (
+      <p className="been-summary">
+        {count
+          ? `Matchups use the ${count === 1 ? '1 spot' : `${count} spots`} you've had.`
+          : "You haven't checked any local spots, so these matchups are chains only."}{' '}
+        <button type="button" onClick={onOpen}>
+          Edit your spots
+        </button>
+      </p>
+    )
+  }
+  return (
+    <section className="been" aria-labelledby="been-title">
+      <h2 id="been-title" className="cond">
+        Which of these have you had?
+      </h2>
+      <p>Tap every spot you&apos;ve tried. You&apos;ll only get matchups for those.</p>
+      <div className="chips">
+        {locals.map((item) => {
+          const on = been?.has(item.id) ?? false
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={on ? 'on' : ''}
+              aria-pressed={on}
+              onClick={() => onToggle(item.id)}
+            >
+              {item.name}
+            </button>
+          )
+        })}
+      </div>
+      <button type="button" className="btn primary" onClick={onDone}>
+        {been?.size ? 'Done' : "I haven't had any"}
+      </button>
+    </section>
   )
 }
 

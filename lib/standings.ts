@@ -4,9 +4,28 @@ import { db } from './db'
 import { START_SCORE } from './elo'
 import type { Item } from './items'
 
-export type Ranked = Item & { score: number; battles: number; rank: number }
+export type Ranked = Item & {
+  score: number
+  battles: number
+  /** Position among the board's established items. New spots come after them. */
+  rank: number
+  /** A local spot with too few votes for a rank yet. */
+  isNew: boolean
+}
 
-export type Standings = { items: Ranked[]; totalVotes: number }
+/** Local spots show as "New" instead of a rank until they have this many votes. */
+export const NEW_UNTIL = 15
+
+/** "#4", or "New" for a spot still being ranked. */
+export const rankLabel = (item: Ranked) => (item.isNew ? 'New' : `#${item.rank}`)
+
+export type Standings = {
+  /** Established items by points, then new spots by points. */
+  items: Ranked[]
+  /** How many items have a rank: "#4 of `ranked`". */
+  ranked: number
+  totalVotes: number
+}
 
 export type HeadToHead = { wins: number; losses: number }
 
@@ -31,13 +50,22 @@ export const getStandings = cache(
       score: scores.get(item.id)?.score ?? START_SCORE,
       battles: scores.get(item.id)?.battles ?? 0,
       rank: 0,
+      isNew: false,
     }))
     const totalVotes = Math.round(withScores.reduce((sum, item) => sum + item.battles, 0) / 2)
     const items = withScores
       .filter((item) => item.city === undefined || item.city === cityKey)
-      .sort((a, b) => b.score - a.score || b.battles - a.battles || a.name.localeCompare(b.name))
+      .map((item) => ({ ...item, isNew: item.city !== undefined && item.battles < NEW_UNTIL }))
+      .sort(
+        (a, b) =>
+          Number(a.isNew) - Number(b.isNew) ||
+          b.score - a.score ||
+          b.battles - a.battles ||
+          a.name.localeCompare(b.name)
+      )
     items.forEach((item, index) => (item.rank = index + 1))
-    return { items, totalVotes }
+    const ranked = items.filter((item) => !item.isNew).length
+    return { items, ranked, totalVotes }
   }
 )
 

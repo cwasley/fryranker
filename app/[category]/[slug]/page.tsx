@@ -15,7 +15,7 @@ import {
 import { getCity } from '@/lib/cities'
 import { directionsUrl } from '@/lib/items'
 import { DIRECT_VOTES, split } from '@/lib/reveal'
-import { getMatchups, getStandings } from '@/lib/standings'
+import { getMatchups, getStandings, NEW_UNTIL, rankLabel } from '@/lib/standings'
 import { formatCount, titleCase } from '@/lib/text'
 import { social } from '@/lib/metadata'
 
@@ -47,8 +47,12 @@ export async function generateMetadata({
   params,
 }: PageProps<'/[category]/[slug]'>): Promise<Metadata> {
   const { category, standings, ranked, scope, scopeTitle } = await load(params)
-  const title = `${ranked.fullName}: Ranked #${ranked.rank} of ${standings.items.length} ${scopeTitle}`
-  const description = `${ranked.fullName} rank #${ranked.rank} of ${standings.items.length} ${scope} on FryRanker after ${formatCount(ranked.battles)} head-to-head votes. ${ranked.note}`
+  const title = ranked.isNew
+    ? `${ranked.fullName}: New on the ${scopeTitle} Board`
+    : `${ranked.fullName}: Ranked #${ranked.rank} of ${standings.ranked} ${scopeTitle}`
+  const description = ranked.isNew
+    ? `${ranked.fullName} just joined the ${scope} rankings on FryRanker. Vote head to head to give it a rank. ${ranked.note}`
+    : `${ranked.fullName} rank #${ranked.rank} of ${standings.ranked} ${scope} on FryRanker after ${formatCount(ranked.battles)} head-to-head votes. ${ranked.note}`
   const path = itemPath(category, ranked)
   return {
     title,
@@ -61,7 +65,8 @@ export async function generateMetadata({
 export default async function ItemPage({ params }: PageProps<'/[category]/[slug]'>) {
   const { category, city, standings, ranked, scope } = await load(params)
   const matchups = await getMatchups(category)
-  const total = standings.items.length
+  const total = standings.ranked
+  const toGo = NEW_UNTIL - ranked.battles
 
   const opponents = standings.items
     .filter((other) => other.id !== ranked.id)
@@ -89,7 +94,9 @@ export default async function ItemPage({ params }: PageProps<'/[category]/[slug]
             <Disc category={category} item={ranked} />
             <div>
               <p className="rank">
-                #{ranked.rank} of {total} {scope}
+                {ranked.isNew
+                  ? `New on the board · ${scope}`
+                  : `#${ranked.rank} of ${total} ${scope}`}
               </p>
               <h1 className="cond">
                 <Name text={ranked.fullName} />
@@ -99,7 +106,7 @@ export default async function ItemPage({ params }: PageProps<'/[category]/[slug]
 
           <div className="prices">
             <div className="price">
-              <b className="cond">#{ranked.rank}</b>
+              <b className="cond">{rankLabel(ranked)}</b>
               <small>Rank</small>
             </div>
             <div className="price">
@@ -112,22 +119,30 @@ export default async function ItemPage({ params }: PageProps<'/[category]/[slug]
             </div>
           </div>
 
-          <p className="lede">
-            Ranked #{ranked.rank} of {total}
-            {above && (
-              <>
-                , behind <Link href={itemPath(category, above)}>{above.name}</Link>
-              </>
-            )}
-            {below && (
-              <>
-                {above ? ' and ahead of ' : ', ahead of '}
-                <Link href={itemPath(category, below)}>{below.name}</Link>
-              </>
-            )}
-            . Going by every vote so far, {ranked.name} would beat {favored} of the other{' '}
-            {total - 1}.
-          </p>
+          {ranked.isNew ? (
+            <p className="lede">
+              {ranked.name} is new to the board. It gets a rank after {NEW_UNTIL} votes, so{' '}
+              {toGo === 1 ? 'one more vote does it' : `${toGo} more votes do it`}. Had them? Vote
+              below.
+            </p>
+          ) : (
+            <p className="lede">
+              Ranked #{ranked.rank} of {total}
+              {above && (
+                <>
+                  , behind <Link href={itemPath(category, above)}>{above.name}</Link>
+                </>
+              )}
+              {below && (
+                <>
+                  {above ? ' and ahead of ' : ', ahead of '}
+                  <Link href={itemPath(category, below)}>{below.name}</Link>
+                </>
+              )}
+              . Going by every vote so far, {ranked.name} would beat {favored} of the other{' '}
+              {total - 1}.
+            </p>
+          )}
 
           <section className="order-ticket">
             <h2 className="cond">{category.ticketTitle}</h2>
@@ -175,7 +190,7 @@ export default async function ItemPage({ params }: PageProps<'/[category]/[slug]
                   <span>
                     <span className="who">
                       vs {other.name}
-                      <small>#{other.rank}</small>
+                      <small>{rankLabel(other)}</small>
                     </span>
                     <span className="meter">
                       <i style={{ width: `${s.pct}%` }} />

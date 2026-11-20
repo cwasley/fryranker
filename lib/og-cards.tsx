@@ -53,7 +53,8 @@ export async function rankerCard(category: Category, city?: City) {
 }
 
 export async function itemCard(category: Category, item: Item) {
-  const { items } = await getStandings(category, scopeOf(item))
+  const standings = await getStandings(category, scopeOf(item))
+  const { items } = standings
   const ranked = items.find((entry) => entry.id === item.id)!
   const size = ranked.fullName.length > 18 ? 92 : 116
   return ogCard(
@@ -61,8 +62,11 @@ export async function itemCard(category: Category, item: Item) {
       <Disc category={category} item={ranked} size={270} />
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 16 }}>
         <Plate>
-          #{ranked.rank} of {items.length}{' '}
-          {item.city ? `${category.many} in ${getCity(item.city)?.short}` : category.plural}
+          {ranked.isNew
+            ? `New on the ${getCity(item.city)?.short} board`
+            : `#${ranked.rank} of ${standings.ranked} ${
+                item.city ? `${category.many} in ${getCity(item.city)?.short}` : category.plural
+              }`}
         </Plate>
         <div style={cond(size)}>{ranked.fullName}</div>
         <div style={{ display: 'flex', fontSize: 34, fontWeight: 800, color: C.soft }}>

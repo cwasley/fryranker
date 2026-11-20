@@ -29,12 +29,16 @@ export default function MenuBoard({
         {items.map((item) => (
           <li
             key={item.id}
-            className={[item.rank <= 3 && 'podium', item.rank === 1 && 'champ']
+            className={[
+              !item.isNew && item.rank <= 3 && 'podium',
+              !item.isNew && item.rank === 1 && 'champ',
+              item.isNew && 'new',
+            ]
               .filter(Boolean)
               .join(' ')}
           >
             <Link href={itemPath(category, item)}>
-              <span className="n cond">{item.rank}</span>
+              <span className="n cond">{item.isNew ? 'New' : item.rank}</span>
               <span className="nm cond">
                 <span>
                   <Name text={item.name} />

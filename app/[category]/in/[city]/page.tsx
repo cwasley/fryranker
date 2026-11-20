@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Breadcrumbs from '@/components/Breadcrumbs'
+import FryMap from '@/components/FryMap'
 import JsonLd from '@/components/JsonLd'
 import MenuBoard from '@/components/MenuBoard'
 import Ranker from '@/components/Ranker'
@@ -12,7 +13,9 @@ import { directionsUrl, isLocal } from '@/lib/items'
 import { social } from '@/lib/metadata'
 import { placeSearchEnabled } from '@/lib/places'
 import { absoluteUrl } from '@/lib/site'
-import { getMatchups, getStandings } from '@/lib/standings'
+import { glyphSvg } from '@/lib/glyphs'
+import { getMatchups, getStandings, rankLabel } from '@/lib/standings'
+import { visitorKeys } from '@/lib/visitor'
 import { formatCount, titleCase } from '@/lib/text'
 
 export const revalidate = 300
@@ -37,9 +40,13 @@ async function load(params: Params) {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { category, city, locals } = await load(params)
-  const [first, second] = locals
+  const ranked = locals.filter((item) => !item.isNew)
   const title = `Best ${titleCase(category.many)} in ${city.name}: ${locals.length} Local Spots vs the Chains`
-  const description = `${first.name} leads ${city.name}'s local ${category.many}, then ${second.name}. Vote head to head between local spots and the big chains to settle the city's best ${category.many}.`
+  const lead =
+    ranked.length >= 2
+      ? `${ranked[0].name} leads ${city.name}'s local ${category.many}, then ${ranked[1].name}.`
+      : `${locals.length} local spots just joined ${city.name}'s ${category.many} board.`
+  const description = `${lead} Vote head to head between local spots and the big chains to settle the city's best ${category.many}.`
   const path = cityPath(category, city)
   return {
     title,
@@ -92,6 +99,38 @@ export default async function CityPage({ params }: { params: Params }) {
             sub={`Locals and chains together, by points. ${formatCount(standings.totalVotes)} votes so far.`}
           />
         </div>
+      </section>
+
+      <section className="map-section" aria-labelledby="map-title">
+        <h2 id="map-title" className="cond">
+          The {city.short} fry map
+        </h2>
+        <p>Bigger pins are the top three. Tap a pin to vote or get directions.</p>
+        <FryMap
+          center={{ lat: city.lat, lng: city.lng }}
+          beenKey={visitorKeys(category).been}
+          spots={locals.flatMap((item) =>
+            item.place
+              ? [
+                  {
+                    id: item.id,
+                    name: item.name,
+                    neighborhood: item.place.neighborhood,
+                    kind: item.kind,
+                    lat: item.place.lat,
+                    lng: item.place.lng,
+                    label: rankLabel(item),
+                    podium: !item.isNew && locals.indexOf(item) < 3,
+                    isNew: item.isNew,
+                    glyph: glyphSvg(category, item),
+                    href: itemPath(category, item),
+                    voteHref: `${path}?with=${item.slug}`,
+                    directions: directionsUrl(item) ?? '',
+                  },
+                ]
+              : []
+          )}
+        />
       </section>
 
       <section className="spots" aria-labelledby="where">

@@ -17,7 +17,7 @@ export type Item = {
    */
   city?: string
   /** Where to find a local spot. */
-  place?: { neighborhood: string; address: string }
+  place?: { neighborhood: string; address: string; lat: number; lng: number }
 }
 
 export const isLocal = (item: Item) => item.city !== undefined

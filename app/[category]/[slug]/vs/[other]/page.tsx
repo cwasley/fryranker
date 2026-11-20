@@ -10,6 +10,7 @@ import {
   getMatchups,
   getStandings,
   INDEXABLE_MATCHUP_VOTES,
+  rankLabel,
   scopeOf,
   type Ranked,
 } from '@/lib/standings'
@@ -61,7 +62,7 @@ function headline(left: Ranked, right: Ranked, pct: number, direct: boolean) {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { category, standings, left, right, canonical, split: s } = await load(params)
   const title = `${category.matchupTitle(left, right)}: Which Is Better?`
-  const description = `${headline(left, right, s.pct, s.direct)} Based on ${formatCount(s.direct ? s.votes : standings.totalVotes)} votes on FryRanker, where ${left.name} is #${left.rank} and ${right.name} is #${right.rank} of ${standings.items.length} ${category.plural}.`
+  const description = `${headline(left, right, s.pct, s.direct)} Based on ${formatCount(s.direct ? s.votes : standings.totalVotes)} votes on FryRanker, where ${left.name} is ${rankLabel(left)} and ${right.name} is ${rankLabel(right)}.`
   return {
     title,
     description,
@@ -129,7 +130,7 @@ export default async function MatchupPage({ params }: { params: Params }) {
       </div>
 
       <div className="tape">
-        {row('Rank', `#${left.rank}`, `#${right.rank}`, left.rank < right.rank)}
+        {row('Rank', rankLabel(left), rankLabel(right), left.rank < right.rank)}
         {row('Points', String(left.score), String(right.score), left.score > right.score)}
         {row('Votes', formatCount(left.battles), formatCount(right.battles), null)}
         {row(category.kindLabel, left.kind, right.kind, null)}

@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import Barcode from '@/components/Barcode'
 import { getCategory, itemPath } from '@/lib/categories'
 import { parseShare } from '@/lib/share'
-import { getStandings, scopeOf } from '@/lib/standings'
+import { getStandings, rankLabel, scopeOf } from '@/lib/standings'
 import { list } from '@/lib/text'
 import { social } from '@/lib/metadata'
 
@@ -38,6 +38,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function SharePage({ params }: { params: Params }) {
   const { category, picks } = await load(params)
   const { items } = await getStandings(category, scopeOf(...picks))
+  const crowdRank = (id: number) => {
+    const entry = items.find((other) => other.id === id)
+    return entry ? rankLabel(entry) : ''
+  }
 
   return (
     <main className="page">
@@ -57,9 +61,7 @@ export default async function SharePage({ params }: { params: Params }) {
           {picks.map((item) => (
             <li key={item.id}>
               <Link href={itemPath(category, item)}>{item.name}</Link>
-              <span className="crowd-rank">
-                Crowd #{items.find((entry) => entry.id === item.id)?.rank}
-              </span>
+              <span className="crowd-rank">Crowd {crowdRank(item.id)}</span>
             </li>
           ))}
         </ol>

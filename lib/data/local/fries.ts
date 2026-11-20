@@ -18,7 +18,12 @@ export const localFries: Item[] = [
     kind: 'Shoestring',
     tags: ['Skinny shoestring', 'Golden crisp', 'Well salted', 'Not greasy'],
     note: 'Fast-food-style shoestrings done better: crisper, saltier and lighter on the oil.',
-    ...la({ neighborhood: 'Chinatown', address: '727 N Broadway #117, Los Angeles, CA 90012' }),
+    ...la({
+      neighborhood: 'Chinatown',
+      address: '727 N Broadway #117, Los Angeles, CA 90012',
+      lat: 34.06092,
+      lng: -118.2391,
+    }),
   },
   {
     id: 1001,
@@ -28,7 +33,12 @@ export const localFries: Item[] = [
     kind: 'Seasoned',
     tags: ['Paprika garlic', 'Secret seasoning', 'Giant bags', 'Order well done'],
     note: 'Straight cuts in a secret paprika-garlic blend, served by the bagful.',
-    ...la({ neighborhood: 'Winnetka', address: '20036 Vanowen St, Winnetka, CA 91306' }),
+    ...la({
+      neighborhood: 'Winnetka',
+      address: '20036 Vanowen St, Winnetka, CA 91306',
+      lat: 34.19375,
+      lng: -118.57003,
+    }),
   },
   {
     id: 1002,
@@ -38,7 +48,12 @@ export const localFries: Item[] = [
     kind: 'Belgian Frites',
     tags: ['Belgian style', 'Double fried', 'Dipping sauces', 'Curry ketchup'],
     note: 'Twice-fried Belgian fries with a lineup of dips. Curry ketchup is the move.',
-    ...la({ neighborhood: 'Arts District', address: '800 E 3rd St, Los Angeles, CA 90013' }),
+    ...la({
+      neighborhood: 'Arts District',
+      address: '800 E 3rd St, Los Angeles, CA 90013',
+      lat: 34.04574,
+      lng: -118.23603,
+    }),
   },
   {
     id: 1003,
@@ -48,7 +63,12 @@ export const localFries: Item[] = [
     kind: 'Battered',
     tags: ['Beef tallow', 'Diner fries', 'Craggy crunch', 'Fluffy inside'],
     note: 'Battered, craggy fries in beef tallow. Diner fries, turned all the way up.',
-    ...la({ neighborhood: 'Larchmont', address: '127 N Larchmont Blvd, Los Angeles, CA 90004' }),
+    ...la({
+      neighborhood: 'Larchmont',
+      address: '127 N Larchmont Blvd, Los Angeles, CA 90004',
+      lat: 34.07644,
+      lng: -118.32371,
+    }),
   },
   {
     id: 1004,
@@ -58,7 +78,12 @@ export const localFries: Item[] = [
     kind: 'Juice-Soaked',
     tags: ['Greek marinade', 'Spicy vinegar', 'Rough cut', 'Bring napkins'],
     note: 'Thin fries soaked in "the juice," a spicy, vinegary marinade. Fork recommended.',
-    ...la({ neighborhood: 'Pico-Union', address: '2575 W Pico Blvd, Los Angeles, CA 90006' }),
+    ...la({
+      neighborhood: 'Pico-Union',
+      address: '2575 W Pico Blvd, Los Angeles, CA 90006',
+      lat: 34.04731,
+      lng: -118.29383,
+    }),
   },
   {
     id: 1005,
@@ -68,7 +93,12 @@ export const localFries: Item[] = [
     kind: 'Tallow Fries',
     tags: ['Beef tallow', 'Light + airy', 'Subtly beefy', 'Sports bar'],
     note: 'Beef tallow fries at a sports bar that takes its fries more seriously than its games.',
-    ...la({ neighborhood: 'Hollywood', address: '5901 Melrose Ave, Los Angeles, CA 90038' }),
+    ...la({
+      neighborhood: 'Hollywood',
+      address: '5901 Melrose Ave, Los Angeles, CA 90038',
+      lat: 34.08353,
+      lng: -118.32885,
+    }),
   },
   {
     id: 1006,
@@ -78,7 +108,12 @@ export const localFries: Item[] = [
     kind: 'Curly',
     tags: ['Curly spirals', 'Seasoned', 'Golden', 'Deli side'],
     note: 'Seasoned curly fries at a Valley deli institution. Always take the upgrade.',
-    ...la({ neighborhood: 'Northridge', address: '19565 Parthenia St, Northridge, CA 91324' }),
+    ...la({
+      neighborhood: 'Northridge',
+      address: '19565 Parthenia St, Northridge, CA 91324',
+      lat: 34.22828,
+      lng: -118.55937,
+    }),
   },
   {
     id: 1007,
@@ -88,7 +123,12 @@ export const localFries: Item[] = [
     kind: 'Crinkle Cut',
     tags: ['Numbing peppercorn', 'Dried chiles', 'Garlic', 'Very spicy'],
     note: 'Crinkle cuts tossed with numbing peppercorns, dried chiles and garlic. Keep a drink close.',
-    ...la({ neighborhood: 'West LA', address: '11057 Santa Monica Blvd, Los Angeles, CA 90025' }),
+    ...la({
+      neighborhood: 'West LA',
+      address: '11057 Santa Monica Blvd, Los Angeles, CA 90025',
+      lat: 34.04814,
+      lng: -118.44305,
+    }),
   },
   {
     id: 1008,
@@ -101,6 +141,8 @@ export const localFries: Item[] = [
     ...la({
       neighborhood: 'Silver Lake',
       address: '4156 Santa Monica Blvd, Los Angeles, CA 90029',
+      lat: 34.09127,
+      lng: -118.28309,
     }),
   },
   {
@@ -111,6 +153,11 @@ export const localFries: Item[] = [
     kind: 'Seasoned',
     tags: ['Sumac', 'Garlic oil', 'Whipped garlic', 'Fresh parsley'],
     note: 'Sumac fries in garlic oil and parsley, with whipped garlic for dunking.',
-    ...la({ neighborhood: 'Sherman Oaks', address: '4515 Sepulveda Blvd, Sherman Oaks, CA 91403' }),
+    ...la({
+      neighborhood: 'Sherman Oaks',
+      address: '4515 Sepulveda Blvd, Sherman Oaks, CA 91403',
+      lat: 34.15195,
+      lng: -118.46705,
+    }),
   },
 ]

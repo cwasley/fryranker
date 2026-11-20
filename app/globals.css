@@ -1593,3 +1593,201 @@ footer.foot a {
   color: #22140c;
   font-weight: 800;
 }
+
+/* Been-there checklist */
+.been {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: var(--line) solid var(--ink);
+  border-radius: 14px;
+  background: var(--card);
+  text-align: center;
+}
+
+.been h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.been p {
+  margin: 4px 0 12px;
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.been .chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.been .chips button {
+  padding: 8px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.been .chips button.on {
+  background: var(--mustard);
+  color: #22140c;
+}
+
+.been .chips button.on::before {
+  content: '✓ ';
+}
+
+.been-summary {
+  margin: 0 0 12px;
+  text-align: center;
+  color: var(--soft);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.been-summary button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--red);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* "New" in a board's rank column */
+.board li.new .n {
+  font-size: 0.55em;
+  letter-spacing: 0.04em;
+  color: var(--mustard);
+}
+
+/* City fry map */
+.map-section {
+  max-width: var(--max);
+  margin: 28px auto 0;
+}
+
+.map-section h2 {
+  margin: 0;
+}
+
+.map-section > p {
+  margin: 4px 0 10px;
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.fry-map {
+  height: 420px;
+  border: var(--line) solid var(--ink);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--lift);
+  /* Keep Leaflet's panes under the sticky site header. */
+  position: relative;
+  z-index: 0;
+}
+
+@media (min-width: 720px) {
+  .fry-map {
+    height: 520px;
+  }
+}
+
+.fry-pin {
+  background: none;
+  border: 0;
+}
+
+.fry-pin .pin {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 2.5px solid #22140c;
+  border-radius: 50%;
+  background: #ffbf1f;
+  box-shadow: 2px 2px 0 #22140c;
+}
+
+.fry-pin .pin.podium {
+  background: #d62718;
+}
+
+.fry-pin .pin.new {
+  background: #fff6e5;
+}
+
+.fry-pin .pin svg {
+  width: 100%;
+  height: 100%;
+}
+
+.fry-pin .pin b {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 5px;
+  border: 1.5px solid #22140c;
+  border-radius: 999px;
+  background: #fffdf7;
+  color: #22140c;
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.fry-pin .pin.been::after {
+  content: '✓';
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #22140c;
+  border-radius: 50%;
+  background: #2f9e44;
+  color: #fff;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.map-card {
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+  font-family: inherit;
+  color: #22140c;
+}
+
+.map-card strong {
+  font-size: 16px;
+}
+
+.map-card small {
+  color: #6b5546;
+  font-weight: 600;
+}
+
+.map-card span {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.map-card a {
+  color: #d62718;
+  font-weight: 800;
+}
