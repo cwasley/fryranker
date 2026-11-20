@@ -1582,7 +1582,8 @@ footer.foot a {
   font-weight: 700;
 }
 
-.suggest-done {
+/* Beats `.suggest-wrap > p`, which would otherwise mute the text. */
+.suggest-wrap .suggest-done {
   max-width: 480px;
   margin: 0 auto;
   padding: 14px;
