@@ -5,9 +5,8 @@ import type { Item } from './items'
 export type Insight = { label: string; value: string; hint: string }
 
 export type Category = {
+  /** Also the `category` value on this category's rows in `items`, `matchups` and `votes`. */
   key: 'fries' | 'sauces'
-  /** Postgres table holding each item's score and battle count. */
-  table: 'fries' | 'sauces'
   items: Item[]
   /** Where the ranker lives. */
   home: string
@@ -105,7 +104,6 @@ const sauceInsights = (top: Item[]): Insight[] => {
 export const categories: Record<Category['key'], Category> = {
   fries: {
     key: 'fries',
-    table: 'fries',
     items: fries,
     home: '/',
     base: '/fries',
@@ -122,7 +120,6 @@ export const categories: Record<Category['key'], Category> = {
   },
   sauces: {
     key: 'sauces',
-    table: 'sauces',
     items: sauces,
     home: '/sauces',
     base: '/sauces',

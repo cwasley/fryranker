@@ -6,7 +6,8 @@
 
 ## Data
 
-- Item `id`s are primary keys in `fries`/`sauces`, and `matchups`/`votes` reference them. Add new ids; never renumber.
+- Item `id`s, with the category, are the primary key in `items`, and `matchups`/`votes` reference them. Add new ids; never renumber.
+- The old `fries` and `sauces` tables are no longer read or written. Don't build on them; they're kept only until the switch to `items` has settled.
 - Item `slug`s are public URLs (item, matchup and share pages). Never change a shipped slug. If one must change, add a permanent redirect in `next.config.ts`.
 - Adding an item: append it to `lib/data/*.ts`, then run `yarn db:setup` to insert its row.
 - There is one database. Local dev, preview deploys and production all share it, so a vote cast while testing counts. Don't script votes against it. To test vote SQL, run `voteStatements()` inside a transaction against temp tables (pg_temp shadows the real tables).

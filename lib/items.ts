@@ -1,5 +1,5 @@
 export type Item = {
-  /** Primary key in the category's table. Never renumber: votes and matchups reference it. */
+  /** With the category, the primary key in `items`. Never renumber: votes and matchups reference it. */
   id: number
   /** URL segment for the item's page. Never change one that has shipped: it breaks inbound links. */
   slug: string
