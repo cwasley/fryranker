@@ -321,7 +321,11 @@ export default function Ranker({
           locals={locals}
           been={spots.been}
           open={checklistOpen || spots.been === null}
-          onToggle={spots.toggle}
+          onToggle={(id) => {
+            // Stay open until "Done", even once the first tap has saved an answer.
+            setChecklistOpen(true)
+            spots.toggle(id)
+          }}
           onOpen={() => setChecklistOpen(true)}
           onDone={closeChecklist}
         />
