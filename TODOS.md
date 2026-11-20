@@ -33,7 +33,7 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 
 1. **First-visit hint.** One dismissible line above the first duel: "Tap the one you'd rather eat. 10 picks a round." New visitors currently have to work out the ticket and the rounds on their own.
 2. **Real-iPhone preview check.** Text the home, a fry page, a matchup and a receipt link to ourselves and fix anything iMessage crops. Use `?v=2` on links sent before the redesign, since iMessage caches previews.
-3. **Add missing chains.** Whataburger, Bojangles, Freddy's, A&W, Farmer Boys (USA Today 10Best's #2 in 2026) and Zaxby's fries. Each one is a data entry, a slug and `yarn db:setup`, and it brings new pages and search terms with it.
+3. **Add missing chains.** Whataburger, Bojangles, Freddy's, Zaxby's, Smashburger, Portillo's and Taco John's are in. Still to check and add: A&W and Farmer Boys (USA Today 10Best's #2 in 2026). Each one is a data entry, a slug and `yarn db:setup`, and it brings new pages and search terms with it.
 4. **Uptime and vote-spam alerts.** Bot Protection is on Log now. Add an hourly check of the key pages and the preview cards, and an alert when votes per hour spike, along the lines of earnrate's live check.
 5. **Guard the vote endpoint.** If spam shows up, add Vercel BotID (invisible, no CAPTCHA) to `/api/vote` alone, rather than challenging the whole site and breaking previews again.
 6. **Desktop keyboard shortcuts.** ← and → to pick, space for "Too close to call". The old site had these before the mobile-first pass.
@@ -58,4 +58,5 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 
 ## Housekeeping (not scored)
 
+- Once the `items` switch has been live for a week with no rollback: `DROP TRIGGER mirror_to_items ON fries; DROP TRIGGER mirror_to_items ON sauces; DROP FUNCTION mirror_legacy_scores(); DROP TABLE fries, sauces;` and remove the copy step and `LEGACY_KIND_COLUMN` from `lib/schema.ts`.
 - Unit tests for `lib/reveal.ts`, `lib/share.ts` and the Elo math, plus a Playwright smoke test of a full round with the vote API stubbed out.

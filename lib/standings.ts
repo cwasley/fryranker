@@ -11,8 +11,9 @@ export type Standings = { items: Ranked[]; totalVotes: number }
 export type HeadToHead = { wins: number; losses: number }
 
 export const getStandings = cache(async (category: Category): Promise<Standings> => {
-  const sql = db()
-  const rows = (await sql`SELECT id, score, battles FROM ${sql.unsafe(category.table)}`) as {
+  const rows = (await db()`
+    SELECT id, score, battles FROM items WHERE category = ${category.key}
+  `) as {
     id: number
     score: number
     battles: number
