@@ -25,7 +25,7 @@
 ## Rendering
 
 - Pages use ISR (`export const revalidate`), not Cache Components, so a crawler's first visit to an uncached URL gets full HTML instead of a loading fallback.
-- Server Components by default. `'use client'` only on `Ranker`, `ShareButton`, `SiteHeader`, `SuggestSpot` and `FryMap`.
+- Server Components by default. `'use client'` only on `Ranker`, `ShareButton`, `SiteHeader`, `SuggestSpot`, `FryMap` and `DailyMatchup`.
 - The first matchup is picked after hydration: the ranker's HTML is cached and shared, so it can't contain a random pair.
 - No `runtime = 'edge'` (it's deprecated). OG cards and icons read the static Archivo TTFs in `assets/fonts/` from disk. Satori can't use the variable woff2 from `next/font`, and never fetch assets from the site itself: it sits behind the Vercel firewall.
 
