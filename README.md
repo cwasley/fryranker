@@ -12,22 +12,30 @@ The definitive fast food fry (and sauce) rankings, decided one head-to-head vote
 
 ```bash
 yarn
-vercel env pull .env.local   # DATABASE_URL and friends
+vercel env pull .env.local   # TEST_DATABASE_URL and friends
 yarn dev
 ```
 
-`.env.local` points at the production database: there is only one. Votes cast from `yarn dev` count.
+There are two databases, both branches of one Neon project:
+
+- **Production** (`main` branch, `DATABASE_URL`): used only when `VERCEL_ENV` is `production`.
+- **Test** (`preview` branch, `TEST_DATABASE_URL`): used by preview deploys and `yarn dev`. It started as a copy of production and drifts from it. To refresh it, use "Reset from parent" on the `preview` branch in the Neon console.
+
+Outside production the app reads only `TEST_DATABASE_URL` and fails if it's missing, so testing can't reach the real votes. Without Vercel access, ask Collin for the test connection string and put it in `.env.local` as `TEST_DATABASE_URL`.
+
+[preview.fryranker.com](https://preview.fryranker.com) shows the latest push to the `preview` git branch. Other branches get their own `*.vercel.app` preview links.
 
 ## Scripts
 
-| Command          | What it does                                                       |
-| ---------------- | ------------------------------------------------------------------ |
-| `yarn dev`       | Dev server                                                         |
-| `yarn build`     | Production build (reads standings from the database)               |
-| `yarn lint`      | ESLint                                                             |
-| `yarn typecheck` | Route types plus `tsc`                                             |
-| `yarn format`    | Prettier                                                           |
-| `yarn db:setup`  | Creates any missing tables and adds rows for new items. Idempotent |
+| Command              | What it does                                                                            |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `yarn dev`           | Dev server                                                                              |
+| `yarn build`         | Production build (reads standings from the database)                                    |
+| `yarn lint`          | ESLint                                                                                  |
+| `yarn typecheck`     | Route types plus `tsc`                                                                  |
+| `yarn format`        | Prettier                                                                                |
+| `yarn db:setup`      | Creates any missing tables and adds rows for new items in the test database. Idempotent |
+| `yarn db:setup:prod` | The same against the production database                                                |
 
 ## How it works
 

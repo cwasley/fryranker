@@ -58,5 +58,4 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 
 ## Housekeeping (not scored)
 
-- A separate Neon branch for development, so local testing never touches the production database.
 - Unit tests for `lib/reveal.ts`, `lib/share.ts` and the Elo math, plus a Playwright smoke test of a full round with the vote API stubbed out.

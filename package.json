@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:setup": "tsx --env-file=.env.local scripts/setup-db.ts"
+    "db:setup": "tsx --env-file=.env.local scripts/setup-db.ts",
+    "db:setup:prod": "tsx --env-file=.env.local scripts/setup-db.ts --prod"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
