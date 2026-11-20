@@ -96,7 +96,7 @@ export const localFries: Item[] = [
     name: 'Josephine',
     fullName: 'Josephine Duck Fat Fries',
     kind: 'Thick Cut',
-    tags: ['Duck fat', 'Triple fried', 'Thick cut', 'Garlic aioli'],
+    tags: ['Duck fat', 'Triple fried', 'Starch rolled', 'Garlic aioli'],
     note: 'Thick duck fat fries, fried three times and served with garlic aioli.',
     ...la({
       neighborhood: 'Silver Lake',

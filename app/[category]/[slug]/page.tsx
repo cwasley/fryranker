@@ -37,14 +37,17 @@ async function load(params: PageProps<'/[category]/[slug]'>['params']) {
   const ranked = standings.items.find((entry) => entry.id === item.id)!
   // "fast food fries" nationally, "fries in Los Angeles" on a city board.
   const scope = city ? `${category.many} in ${city.name}` : category.plural
-  return { category, city, standings, ranked, scope }
+  const scopeTitle = city
+    ? `${titleCase(category.many)} in ${city.name}`
+    : titleCase(category.plural)
+  return { category, city, standings, ranked, scope, scopeTitle }
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<'/[category]/[slug]'>): Promise<Metadata> {
-  const { category, standings, ranked, scope } = await load(params)
-  const title = `${ranked.fullName}: Ranked #${ranked.rank} of ${standings.items.length} ${titleCase(scope)}`
+  const { category, standings, ranked, scope, scopeTitle } = await load(params)
+  const title = `${ranked.fullName}: Ranked #${ranked.rank} of ${standings.items.length} ${scopeTitle}`
   const description = `${ranked.fullName} rank #${ranked.rank} of ${standings.items.length} ${scope} on FryRanker after ${formatCount(ranked.battles)} head-to-head votes. ${ranked.note}`
   const path = itemPath(category, ranked)
   return {
