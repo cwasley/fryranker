@@ -9,6 +9,8 @@ export const SPOTS_EVENT = 'fryranker:spots'
 export const visitorKeys = (category: Category) => ({
   untried: `${category.storageKey}_untried`,
   been: `${category.storageKey}_been`,
+  /** The spots the checklist listed when it was answered, so spots added later count as unknown. */
+  asked: `${category.storageKey}_asked`,
 })
 
 export function readIds(key: string): Set<number> | null {

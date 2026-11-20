@@ -83,25 +83,36 @@ const writeIds = (key: string, ids: Set<number>) => {
  * What the visitor has and hasn't had, kept on the device like the taste profile. `been` is null
  * until they answer the checklist; after that, local spots they didn't check are skipped.
  */
-function useSpots(category: Category) {
-  const { untried: untriedKey, been: beenKey } = visitorKeys(category)
-  type Spots = { untried: Set<number>; been: Set<number> | null }
-  const [state, setState] = useState<Spots>({ untried: new Set(), been: null })
+function useSpots(category: Category, locals: Item[]) {
+  const { untried: untriedKey, been: beenKey, asked: askedKey } = visitorKeys(category)
+  type Spots = { untried: Set<number>; been: Set<number> | null; asked: Set<number> }
+  const [state, setState] = useState<Spots>({ untried: new Set(), been: null, asked: new Set() })
   // The latest value, so taps that land before a re-render build on each other.
   const latest = useRef(state)
   const [ready, setReady] = useState(false)
   useEffect(() => {
     // Storage is only readable after hydration.
-    latest.current = { untried: readIds(untriedKey) ?? new Set(), been: readIds(beenKey) }
+    const been = readIds(beenKey)
+    latest.current = {
+      untried: readIds(untriedKey) ?? new Set(),
+      been,
+      // Answered before this key existed: treat every spot they could see then as asked.
+      asked: readIds(askedKey) ?? (been ? new Set(locals.map((item) => item.id)) : new Set()),
+    }
     setState(latest.current)
     setReady(true)
-  }, [untriedKey, beenKey])
+    // Read once, after hydration.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [untriedKey, beenKey, askedKey])
 
   const save = (next: Spots) => {
     latest.current = next
     setState(next)
     writeIds(untriedKey, next.untried)
-    if (next.been) writeIds(beenKey, next.been)
+    if (next.been) {
+      writeIds(beenKey, next.been)
+      writeIds(askedKey, next.asked)
+    }
     return next
   }
   const without = (ids: Set<number>, id: number) => new Set([...ids].filter((x) => x !== id))
@@ -111,28 +122,35 @@ function useSpots(category: Category) {
     ready,
     untried: state.untried,
     been: state.been,
+    asked: state.asked,
     /** "Never had X". */
     neverHad: (id: number) => {
-      const { untried, been } = latest.current
-      return save({ untried: new Set([...untried, id]), been: been && without(been, id) })
+      const { untried, been, asked } = latest.current
+      return save({ untried: new Set([...untried, id]), been: been && without(been, id), asked })
     },
     /** Checks or unchecks a spot on the checklist. */
     toggle: (id: number) => {
       const { untried, been } = latest.current
       const current = been ?? new Set<number>()
+      const asked = new Set(locals.map((item) => item.id))
       return current.has(id)
-        ? save({ untried, been: without(current, id) })
-        : save({ untried: without(untried, id), been: new Set([...current, id]) })
+        ? save({ untried, been: without(current, id), asked })
+        : save({ untried: without(untried, id), been: new Set([...current, id]), asked })
     },
     /** Saves the checklist as answered, even with nothing checked. */
     answer: () => {
       const { untried, been } = latest.current
-      return save({ untried, been: been ?? new Set() })
+      return save({
+        untried,
+        been: been ?? new Set(),
+        asked: new Set(locals.map((item) => item.id)),
+      })
     },
     clear: () => {
-      save({ untried: new Set(), been: null })
+      save({ untried: new Set(), been: null, asked: new Set() })
       try {
         localStorage.removeItem(beenKey)
+        localStorage.removeItem(askedKey)
       } catch {
         // Nothing to clear.
       }
@@ -141,10 +159,21 @@ function useSpots(category: Category) {
   }
 }
 
-/** Skip anything marked "Never had", and once the checklist is answered, every unchecked spot. */
-const skipSet = (locals: Item[], untried: Set<number>, been: Set<number> | null) =>
+/**
+ * Skip anything marked "Never had", and once the checklist is answered, every spot it listed that
+ * wasn't checked. Spots added since then aren't skipped until the visitor says.
+ */
+const skipSet = (
+  locals: Item[],
+  untried: Set<number>,
+  been: Set<number> | null,
+  asked: Set<number>
+) =>
   been
-    ? new Set([...untried, ...locals.filter((item) => !been.has(item.id)).map((item) => item.id)])
+    ? new Set([
+        ...untried,
+        ...locals.filter((item) => asked.has(item.id) && !been.has(item.id)).map((item) => item.id),
+      ])
     : untried
 
 /** On the national board, points visitors in a city with a board to it. */
@@ -185,9 +214,9 @@ export default function Ranker({
   const category = categories[categoryKey]
   const cityBoard = cityKey !== undefined
   const { taste, record, reset } = useTaste(category)
-  const spots = useSpots(category)
   const locals = useMemo(() => initial.filter(isLocal), [initial])
-  const skip = skipSet(locals, spots.untried, spots.been)
+  const spots = useSpots(category, locals)
+  const skip = skipSet(locals, spots.untried, spots.been, spots.asked)
   const [checklistOpen, setChecklistOpen] = useState(false)
   const [standings, setStandings] = useState(initial)
   const [pair, setPair] = useState<Pair | null>(null)
@@ -237,14 +266,14 @@ export default function Ranker({
   }
 
   const neverHad = (id: number) => {
-    const { untried, been } = spots.neverHad(id)
-    next(skipSet(locals, untried, been))
+    const { untried, been, asked } = spots.neverHad(id)
+    next(skipSet(locals, untried, been, asked))
   }
 
   const closeChecklist = () => {
-    const { untried, been } = spots.answer()
+    const { untried, been, asked } = spots.answer()
     setChecklistOpen(false)
-    next(skipSet(locals, untried, been))
+    next(skipSet(locals, untried, been, asked))
   }
 
   const vote = (index: 0 | 1, now: number) => {
@@ -320,6 +349,7 @@ export default function Ranker({
         <Checklist
           locals={locals}
           been={spots.been}
+          fresh={spots.been ? locals.filter((item) => !spots.asked.has(item.id)).length : 0}
           open={checklistOpen || spots.been === null}
           onToggle={(id) => {
             // Stay open until "Done", even once the first tap has saved an answer.
@@ -448,6 +478,8 @@ export default function Ranker({
 type ChecklistProps = {
   locals: Item[]
   been: Set<number> | null
+  /** Spots added since the visitor last answered. */
+  fresh: number
   open: boolean
   onToggle: (id: number) => void
   onOpen: () => void
@@ -455,7 +487,7 @@ type ChecklistProps = {
 }
 
 /** "Which of these have you had?" Local matchups then stick to the spots the visitor checked. */
-function Checklist({ locals, been, open, onToggle, onOpen, onDone }: ChecklistProps) {
+function Checklist({ locals, been, fresh, open, onToggle, onOpen, onDone }: ChecklistProps) {
   if (!open) {
     const count = been?.size ?? 0
     return (
@@ -463,8 +495,11 @@ function Checklist({ locals, been, open, onToggle, onOpen, onDone }: ChecklistPr
         {count
           ? `Matchups use the ${count === 1 ? '1 spot' : `${count} spots`} you've had.`
           : "You haven't checked any local spots, so these matchups are chains only."}{' '}
+        {fresh > 0 && (
+          <b>{fresh === 1 ? '1 new spot' : `${fresh} new spots`} since you last checked. </b>
+        )}
         <button type="button" onClick={onOpen}>
-          Edit your spots
+          {fresh > 0 ? 'Had any?' : 'Edit your spots'}
         </button>
       </p>
     )
