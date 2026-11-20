@@ -85,44 +85,52 @@ const writeIds = (key: string, ids: Set<number>) => {
  */
 function useSpots(category: Category) {
   const { untried: untriedKey, been: beenKey } = visitorKeys(category)
-  const [untried, setUntried] = useState<Set<number>>(() => new Set())
-  const [been, setBeen] = useState<Set<number> | null>(null)
+  type Spots = { untried: Set<number>; been: Set<number> | null }
+  const [state, setState] = useState<Spots>({ untried: new Set(), been: null })
+  // The latest value, so taps that land before a re-render build on each other.
+  const latest = useRef(state)
   const [ready, setReady] = useState(false)
   useEffect(() => {
     // Storage is only readable after hydration.
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setUntried(readIds(untriedKey) ?? new Set())
-    setBeen(readIds(beenKey))
+    latest.current = { untried: readIds(untriedKey) ?? new Set(), been: readIds(beenKey) }
+    setState(latest.current)
     setReady(true)
-    /* eslint-enable react-hooks/set-state-in-effect */
   }, [untriedKey, beenKey])
 
-  const save = (nextUntried: Set<number>, nextBeen: Set<number> | null) => {
-    setUntried(nextUntried)
-    setBeen(nextBeen)
-    writeIds(untriedKey, nextUntried)
-    if (nextBeen) writeIds(beenKey, nextBeen)
+  const save = (next: Spots) => {
+    latest.current = next
+    setState(next)
+    writeIds(untriedKey, next.untried)
+    if (next.been) writeIds(beenKey, next.been)
+    return next
   }
   const without = (ids: Set<number>, id: number) => new Set([...ids].filter((x) => x !== id))
 
   return {
     /** Storage has been read; until then, don't pick a matchup or show the checklist. */
     ready,
-    untried,
-    been,
+    untried: state.untried,
+    been: state.been,
     /** "Never had X". */
-    neverHad: (id: number) => save(new Set([...untried, id]), been && without(been, id)),
+    neverHad: (id: number) => {
+      const { untried, been } = latest.current
+      return save({ untried: new Set([...untried, id]), been: been && without(been, id) })
+    },
     /** Checks or unchecks a spot on the checklist. */
     toggle: (id: number) => {
+      const { untried, been } = latest.current
       const current = been ?? new Set<number>()
       return current.has(id)
-        ? save(untried, without(current, id))
-        : save(without(untried, id), new Set([...current, id]))
+        ? save({ untried, been: without(current, id) })
+        : save({ untried: without(untried, id), been: new Set([...current, id]) })
     },
     /** Saves the checklist as answered, even with nothing checked. */
-    answer: () => save(untried, been ?? new Set()),
+    answer: () => {
+      const { untried, been } = latest.current
+      return save({ untried, been: been ?? new Set() })
+    },
     clear: () => {
-      save(new Set(), null)
+      save({ untried: new Set(), been: null })
       try {
         localStorage.removeItem(beenKey)
       } catch {
@@ -229,15 +237,14 @@ export default function Ranker({
   }
 
   const neverHad = (id: number) => {
-    spots.neverHad(id)
-    next(new Set([...skip, id]))
+    const { untried, been } = spots.neverHad(id)
+    next(skipSet(locals, untried, been))
   }
 
   const closeChecklist = () => {
-    spots.answer()
+    const { untried, been } = spots.answer()
     setChecklistOpen(false)
-    const been = spots.been ?? new Set<number>()
-    next(skipSet(locals, spots.untried, been))
+    next(skipSet(locals, untried, been))
   }
 
   const vote = (index: 0 | 1, now: number) => {

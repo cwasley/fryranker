@@ -73,7 +73,7 @@ export default async function CityPage({ params }: { params: Params }) {
         <h1 className="cond">
           Best {category.many} in <span>{city.short}</span>
         </h1>
-        <p>{locals.length} local spots take on the chains. Every matchup has at least one local.</p>
+        <p>{locals.length} local spots take on the chains, one matchup at a time.</p>
       </header>
 
       <Ranker

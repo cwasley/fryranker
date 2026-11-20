@@ -35,14 +35,16 @@ const escape = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)}
 
 function pinHtml(spot: MapSpot, been: boolean) {
   const classes = ['pin', spot.podium && 'podium', spot.isNew && 'new', been && 'been']
-  return `<span class="${classes.filter(Boolean).join(' ')}">${spot.glyph}<b>${escape(spot.label)}</b></span>`
+  return `<span class="${classes.filter(Boolean).join(' ')}"><span class="head">${spot.glyph}</span><b>${escape(spot.label)}</b></span>`
 }
 
 function popupHtml(spot: MapSpot) {
+  const tag = spot.isNew ? 'New on the board' : `${spot.label} in LA`
   return `<div class="map-card">
+    <span class="tag${spot.podium ? ' podium' : ''}">${escape(tag)}</span>
     <strong>${escape(spot.name)}</strong>
-    <small>${escape(spot.label === 'New' ? 'New on the board' : `${spot.label} in LA`)} · ${escape(spot.neighborhood)} · ${escape(spot.kind)}</small>
-    <span>
+    <small>${escape(spot.neighborhood)} · ${escape(spot.kind)}</small>
+    <span class="acts">
       <a href="${escape(spot.voteHref)}">Vote on it</a>
       <a href="${escape(spot.href)}">Details</a>
       <a href="${escape(spot.directions)}" target="_blank" rel="noopener">Directions</a>
@@ -72,13 +74,15 @@ export default function FryMap({ center, spots, beenKey }: Props) {
       }).addTo(map)
 
       const icon = (spot: MapSpot, been: boolean) => {
-        const size = spot.podium ? 54 : 42
+        // A square turned 45° into a teardrop: its point sits about 1.2 sizes below the top.
+        const size = spot.podium ? 52 : 42
+        const tip = Math.round(size * 1.21)
         return L.divIcon({
           className: 'fry-pin',
-          html: pinHtml(spot, been),
-          iconSize: [size, size],
-          iconAnchor: [size / 2, size / 2],
-          popupAnchor: [0, -size / 2],
+          html: pinHtml(spot, been).replace('class="pin', `style="--size:${size}px" class="pin`),
+          iconSize: [size, tip],
+          iconAnchor: [size / 2, tip],
+          popupAnchor: [0, -tip + 4],
         })
       }
       redraw = () => {
