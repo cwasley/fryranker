@@ -23,11 +23,13 @@ yarn dev
 | Command          | What it does                                                       |
 | ---------------- | ------------------------------------------------------------------ |
 | `yarn dev`       | Dev server                                                         |
-| `yarn build`     | Production build (reads standings from the database)               |
+| `yarn build`     | Runs `yarn db:setup`, then the production build                    |
 | `yarn lint`      | ESLint                                                             |
 | `yarn typecheck` | Route types plus `tsc`                                             |
 | `yarn format`    | Prettier                                                           |
 | `yarn db:setup`  | Creates any missing tables and adds rows for new items. Idempotent |
+
+Every Vercel build runs `yarn db:setup` first, so adding an item is just a data entry: the deploy adds its row.
 
 `lib/schema.ts` holds the schema. Before `items`, scores lived in separate `fries` and `sauces` tables. `yarn db:setup` copies them into `items` once and adds a trigger that mirrors the old code's updates during the deploy that switches over. The old tables stay until that deploy has settled (see Housekeeping in `TODOS.md`).
 

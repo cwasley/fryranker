@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "yarn db:setup && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:setup": "tsx --env-file=.env.local scripts/setup-db.ts"
+    "db:setup": "tsx scripts/setup-db.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
