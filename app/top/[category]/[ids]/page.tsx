@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import Barcode from '@/components/Barcode'
 import { getCategory, itemPath } from '@/lib/categories'
 import { parseShare } from '@/lib/share'
-import { getStandings } from '@/lib/standings'
+import { getStandings, scopeOf } from '@/lib/standings'
 import { list } from '@/lib/text'
 import { social } from '@/lib/metadata'
 
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function SharePage({ params }: { params: Params }) {
   const { category, picks } = await load(params)
-  const { items } = await getStandings(category)
+  const { items } = await getStandings(category, scopeOf(...picks))
 
   return (
     <main className="page">

@@ -2,9 +2,17 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { categories, itemPath, type Category } from '@/lib/categories'
+import {
+  categories,
+  citiesFor,
+  cityPath,
+  itemPath,
+  localsIn,
+  type Category,
+} from '@/lib/categories'
+import { getCity, type City } from '@/lib/cities'
 import { eloDelta, GLOBAL_K } from '@/lib/elo'
-import type { Item } from '@/lib/items'
+import { isLocal, type Item } from '@/lib/items'
 import { badge, isHotTake, split, verdict, type Split } from '@/lib/reveal'
 import { sharePath } from '@/lib/share'
 import type { MatchupRow, Ranked } from '@/lib/standings'
@@ -20,6 +28,8 @@ type Props = {
   standings: Ranked[]
   totalVotes: number
   matchups: MatchupRow[]
+  /** Set on a city board: every matchup includes at least one of the city's local spots. */
+  cityKey?: string
 }
 
 const ROUND = 10
@@ -30,33 +40,102 @@ const RATE_LIMIT_MS = 60_000
 type Pair = [number, number]
 type Pick = { winner: Item; loser: Item; split: Split }
 
-function randomPair(items: Item[], include?: number): Pair {
-  const pick = () => items[Math.floor(Math.random() * items.length)].id
-  const first = include ?? pick()
-  let second = pick()
-  while (second === first) second = pick()
+/**
+ * A random pair from the pool, leaving out anything the visitor hasn't tried (unless that leaves
+ * too few). `include` pins one side. On a city board, with nothing pinned, one side is always a
+ * local spot.
+ */
+function randomPair(pool: Item[], skip: Set<number>, cityBoard: boolean, include?: number): Pair {
+  const tried = pool.filter((item) => !skip.has(item.id))
+  const usable = tried.length >= 2 ? tried : pool
+  const any = (items: Item[]) => items[Math.floor(Math.random() * items.length)].id
+  const locals = usable.filter(isLocal)
+  const first = include ?? (cityBoard && locals.length ? any(locals) : any(usable))
+  const others = usable.filter((item) => item.id !== first)
+  const second = any(others.length ? others : pool.filter((item) => item.id !== first))
   return Math.random() < 0.5 ? [first, second] : [second, first]
 }
 
 /** `?a=slug&b=slug` starts on that matchup; `?with=slug` starts with that item. */
-function pairFromUrl(items: Item[]): Pair | undefined {
+function pairFromUrl(pool: Item[], skip: Set<number>, cityBoard: boolean): Pair | undefined {
   const params = new URLSearchParams(window.location.search)
-  const find = (slug: string | null) => items.find((item) => item.slug === slug)?.id
+  const find = (slug: string | null) => pool.find((item) => item.slug === slug)?.id
   const a = find(params.get('a'))
   const b = find(params.get('b'))
   const only = find(params.get('with'))
   if (a === undefined && b === undefined && only === undefined) return undefined
   window.history.replaceState(null, '', window.location.pathname)
   if (a !== undefined && b !== undefined && a !== b) return [a, b]
-  return randomPair(items, a ?? b ?? only)
+  return randomPair(pool, skip, cityBoard, a ?? b ?? only)
+}
+
+/** Items this visitor has said they've never had. Kept on the device, like the taste profile. */
+function useUntried(category: Category) {
+  const key = `${category.storageKey}_untried`
+  const [untried, setUntried] = useState<Set<number>>(() => new Set())
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) ?? '[]') as number[]
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (saved.length) setUntried(new Set(saved))
+    } catch {
+      // Storage blocked or unreadable: start empty.
+    }
+  }, [key])
+  const save = (next: Set<number>) => {
+    setUntried(next)
+    try {
+      localStorage.setItem(key, JSON.stringify([...next]))
+    } catch {
+      // Storage blocked: remember for this visit only.
+    }
+  }
+  return {
+    untried,
+    add: (id: number) => save(new Set([...untried, id])),
+    clear: () => save(new Set()),
+  }
+}
+
+/** On the national board, points visitors in a city with a board to it. */
+function NearBanner({ category }: { category: Category }) {
+  const [city, setCity] = useState<City>()
+  useEffect(() => {
+    if (!citiesFor(category).length) return
+    let live = true
+    fetch('/api/where')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body: { city: string | null } | null) => {
+        const found = getCity(body?.city ?? undefined)
+        if (live && found && citiesFor(category).includes(found)) setCity(found)
+      })
+      .catch(() => {})
+    return () => {
+      live = false
+    }
+  }, [category])
+  if (!city) return null
+  return (
+    <Link className="near" href={cityPath(category, city)}>
+      In {city.short}? Rank {localsIn(category, city.key).length} local spots &rarr;
+    </Link>
+  )
 }
 
 const SQUIGGLE =
   'M 55 4 C 88 1, 99 20, 98 52 C 97 84, 76 98, 45 96 C 14 94, 1 76, 3 48 C 5 20, 22 5, 62 8 C 70 9, 74 12, 76 15'
 
-export default function Ranker({ categoryKey, standings: initial, totalVotes, matchups }: Props) {
+export default function Ranker({
+  categoryKey,
+  standings: initial,
+  totalVotes,
+  matchups,
+  cityKey,
+}: Props) {
   const category = categories[categoryKey]
+  const cityBoard = cityKey !== undefined
   const { taste, record, reset } = useTaste(category)
+  const { untried, add: markUntried, clear: clearUntried } = useUntried(category)
   const [standings, setStandings] = useState(initial)
   const [pair, setPair] = useState<Pair | null>(null)
   const [picked, setPicked] = useState<{ index: 0 | 1; split: Split } | null>(null)
@@ -78,7 +157,9 @@ export default function Ranker({ categoryKey, standings: initial, totalVotes, ma
   useEffect(() => {
     // The first matchup is random, so it can only be picked after hydration.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPair(pairFromUrl(category.items) ?? randomPair(category.items))
+    setPair(pairFromUrl(initial, untried, cityBoard) ?? randomPair(initial, untried, cityBoard))
+    // Only on load: later pairs come from next().
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category])
 
   useEffect(() => {
@@ -95,9 +176,14 @@ export default function Ranker({ categoryKey, standings: initial, totalVotes, ma
       })
     )
 
-  const next = () => {
+  const next = (skip = untried) => {
     setPicked(null)
-    setPair(randomPair(category.items))
+    setPair(randomPair(initial, skip, cityBoard))
+  }
+
+  const neverHad = (id: number) => {
+    markUntried(id)
+    next(new Set([...untried, id]))
   }
 
   const vote = (index: 0 | 1, now: number) => {
@@ -146,16 +232,17 @@ export default function Ranker({ categoryKey, standings: initial, totalVotes, ma
         category={category}
         round={round}
         top={rankedTaste(taste)
-          .slice(0, 5)
-          .flatMap((entry) => byId.get(entry.id) ?? [])}
+          .flatMap((entry) => byId.get(entry.id) ?? [])
+          .slice(0, 5)}
         onAgain={() => {
           setRound((r) => ({ n: r.n + 1, picks: [] }))
           next()
         }}
         onReset={() => {
           reset()
+          clearUntried()
           setRound({ n: 1, picks: [] })
-          next()
+          next(new Set())
         }}
       />
     )
@@ -167,6 +254,7 @@ export default function Ranker({ categoryKey, standings: initial, totalVotes, ma
 
   return (
     <div>
+      {!cityBoard && <NearBanner category={category} />}
       <div className="ticket">
         <div className="order">
           Order #{(totalVotes + cast + 1).toLocaleString('en-US')}
@@ -259,8 +347,22 @@ export default function Ranker({ categoryKey, standings: initial, totalVotes, ma
         </p>
       )}
 
+      {cityBoard && current?.[0] && current[1] && !picked && (
+        <p className="never-had">
+          Haven&apos;t had one?{' '}
+          {current.map(
+            (item) =>
+              item && (
+                <button key={item.id} type="button" onClick={() => neverHad(item.id)}>
+                  Never had {item.name}
+                </button>
+              )
+          )}
+        </p>
+      )}
+
       <div className="row-actions">
-        <button type="button" className="btn" onClick={next} disabled={Boolean(picked)}>
+        <button type="button" className="btn" onClick={() => next()} disabled={Boolean(picked)}>
           Too close to call
         </button>
       </div>

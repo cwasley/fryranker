@@ -11,4 +11,18 @@ export type Item = {
   color?: string
   tags: string[]
   note: string
+  /**
+   * Set for local spots: the city whose board they're on (a key from `lib/cities.ts`). Chains leave
+   * it unset and appear on the national board.
+   */
+  city?: string
+  /** Where to find a local spot. */
+  place?: { neighborhood: string; address: string }
 }
+
+export const isLocal = (item: Item) => item.city !== undefined
+
+/** Opens the spot in the visitor's maps app. No API key: it's a plain search link. */
+export const directionsUrl = (item: Item) =>
+  item.place &&
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${item.name}, ${item.place.address}`)}`

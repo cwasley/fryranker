@@ -1,20 +1,30 @@
 import type { Category } from './categories'
-import type { Item } from './items'
+import { isLocal, type Item } from './items'
 import { C, cond, Disc, ogCard, Plate } from './og'
 import { split } from './reveal'
-import { getMatchups, getStandings } from './standings'
+import { getCity, type City } from './cities'
+import { getMatchups, getStandings, scopeOf } from './standings'
 import { roundedCount, titleCase } from './text'
 
-export async function rankerCard(category: Category) {
-  const { items, totalVotes } = await getStandings(category)
-  const top = items.slice(0, 3)
+/** The national board's card, or with `city`, the city board's: its top local spots. */
+export async function rankerCard(category: Category, city?: City) {
+  const { items, totalVotes } = await getStandings(category, city?.key)
+  const top = (city ? items.filter(isLocal) : items).slice(0, 3)
   const longest = Math.max(...top.map((item) => item.name.length))
   const size = longest > 14 ? 40 : longest > 10 ? 48 : 56
   return ogCard(
     <div style={{ display: 'flex', alignItems: 'center', gap: 40, width: '100%' }}>
       <div style={{ display: 'flex', flexDirection: 'column', width: 470, gap: 18 }}>
-        <Plate>{roundedCount(totalVotes)} votes</Plate>
-        <div style={cond(100)}>Best {titleCase(category.plural)}</div>
+        <Plate>
+          {city
+            ? `${items.filter(isLocal).length} local spots`
+            : `${roundedCount(totalVotes)} votes`}
+        </Plate>
+        <div style={cond(100)}>
+          {city
+            ? `Best ${titleCase(category.many)} in ${city.short}`
+            : `Best ${titleCase(category.plural)}`}
+        </div>
       </div>
       <div
         style={{
@@ -43,7 +53,7 @@ export async function rankerCard(category: Category) {
 }
 
 export async function itemCard(category: Category, item: Item) {
-  const { items } = await getStandings(category)
+  const { items } = await getStandings(category, scopeOf(item))
   const ranked = items.find((entry) => entry.id === item.id)!
   const size = ranked.fullName.length > 18 ? 92 : 116
   return ogCard(
@@ -51,7 +61,8 @@ export async function itemCard(category: Category, item: Item) {
       <Disc category={category} item={ranked} size={270} />
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 16 }}>
         <Plate>
-          #{ranked.rank} of {items.length} {category.plural}
+          #{ranked.rank} of {items.length}{' '}
+          {item.city ? `${category.many} in ${getCity(item.city)?.short}` : category.plural}
         </Plate>
         <div style={cond(size)}>{ranked.fullName}</div>
         <div style={{ display: 'flex', fontSize: 34, fontWeight: 800, color: C.soft }}>
@@ -63,7 +74,10 @@ export async function itemCard(category: Category, item: Item) {
 }
 
 export async function matchupCard(category: Category, a: Item, b: Item) {
-  const [{ items }, matchups] = await Promise.all([getStandings(category), getMatchups(category)])
+  const [{ items }, matchups] = await Promise.all([
+    getStandings(category, scopeOf(a, b)),
+    getMatchups(category),
+  ])
   const left = items.find((entry) => entry.id === a.id)!
   const right = items.find((entry) => entry.id === b.id)!
   const { wins, losses } = matchups.record(left.id, right.id)

@@ -1,5 +1,7 @@
 import { fries } from './data/fries'
+import { localFries } from './data/local/fries'
 import { sauces } from './data/sauces'
+import { cities, type City } from './cities'
 import type { Item } from './items'
 
 export type Insight = { label: string; value: string; hint: string }
@@ -104,7 +106,7 @@ const sauceInsights = (top: Item[]): Insight[] => {
 export const categories: Record<Category['key'], Category> = {
   fries: {
     key: 'fries',
-    items: fries,
+    items: [...fries, ...localFries],
     home: '/',
     base: '/fries',
     navLabel: 'Fries',
@@ -151,3 +153,14 @@ export const matchupPath = (category: Category, a: Item, b: Item) => {
 
 export const findItem = (category: Category, slug: string) =>
   category.items.find((item) => item.slug === slug)
+
+/** Local spots on a city's board. */
+export const localsIn = (category: Category, cityKey: string) =>
+  category.items.filter((item) => item.city === cityKey)
+
+/** Cities where this category has local spots. */
+export const citiesFor = (category: Category) =>
+  cities.filter((city) => category.items.some((item) => item.city === city.key))
+
+/** The city board's URL, e.g. `/fries/in/los-angeles`. */
+export const cityPath = (category: Category, city: City) => `${category.base}/in/${city.key}`

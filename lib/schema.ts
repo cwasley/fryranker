@@ -26,6 +26,8 @@ export async function setupDatabase(sql: Sql, log: (line: string) => void = cons
         PRIMARY KEY (category, id)
       )
     `,
+    // Local spots (`source = 'local'`) belong to a city board; chains leave it null.
+    sql`ALTER TABLE items ADD COLUMN IF NOT EXISTS city TEXT`,
     // While a deploy switches from the old per-category tables to `items`, the old code is still
     // live for a minute or two. This trigger copies its score updates across so no vote is lost.
     sql`
@@ -102,8 +104,11 @@ export async function setupDatabase(sql: Sql, log: (line: string) => void = cons
     const added = (await sql.transaction(
       category.items.map(
         (item) => sql`
-          INSERT INTO items (category, id, name, kind)
-          VALUES (${category.key}, ${item.id}, ${item.name}, ${item.kind})
+          INSERT INTO items (category, id, name, kind, source, city)
+          VALUES (
+            ${category.key}, ${item.id}, ${item.name}, ${item.kind},
+            ${item.city ? 'local' : 'chain'}, ${item.city ?? null}
+          )
           ON CONFLICT (category, id) DO NOTHING
           RETURNING name
         `

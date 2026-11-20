@@ -10,27 +10,39 @@ export type Standings = { items: Ranked[]; totalVotes: number }
 
 export type HeadToHead = { wins: number; losses: number }
 
-export const getStandings = cache(async (category: Category): Promise<Standings> => {
+/** Every item's score and battle count, read once per render. */
+const getScores = cache(async (category: Category) => {
   const rows = (await db()`
     SELECT id, score, battles FROM items WHERE category = ${category.key}
-  `) as {
-    id: number
-    score: number
-    battles: number
-  }[]
-  const byId = new Map(rows.map((row) => [row.id, row]))
-  const items = category.items
-    .map((item) => ({
+  `) as { id: number; score: number; battles: number }[]
+  return new Map(rows.map((row) => [row.id, row]))
+})
+
+/**
+ * The board for a scope: the national board (chains only) when `cityKey` is unset, or a city's
+ * board (the chains plus that city's local spots). Everyone shares one points scale, so a local
+ * spot's points mean the same as a chain's. `totalVotes` always counts every vote in the category.
+ */
+export const getStandings = cache(
+  async (category: Category, cityKey?: string): Promise<Standings> => {
+    const scores = await getScores(category)
+    const withScores = category.items.map((item) => ({
       ...item,
-      score: byId.get(item.id)?.score ?? START_SCORE,
-      battles: byId.get(item.id)?.battles ?? 0,
+      score: scores.get(item.id)?.score ?? START_SCORE,
+      battles: scores.get(item.id)?.battles ?? 0,
       rank: 0,
     }))
-    .sort((a, b) => b.score - a.score || b.battles - a.battles || a.name.localeCompare(b.name))
-  items.forEach((item, index) => (item.rank = index + 1))
-  const totalVotes = Math.round(items.reduce((sum, item) => sum + item.battles, 0) / 2)
-  return { items, totalVotes }
-})
+    const totalVotes = Math.round(withScores.reduce((sum, item) => sum + item.battles, 0) / 2)
+    const items = withScores
+      .filter((item) => item.city === undefined || item.city === cityKey)
+      .sort((a, b) => b.score - a.score || b.battles - a.battles || a.name.localeCompare(b.name))
+    items.forEach((item, index) => (item.rank = index + 1))
+    return { items, totalVotes }
+  }
+)
+
+/** The board a page about these items should rank them on: a local spot's city, else national. */
+export const scopeOf = (...items: Item[]) => items.find((item) => item.city)?.city
 
 const pairKey = (a: number, b: number) => (a < b ? `${a}:${b}` : `${b}:${a}`)
 

@@ -4,7 +4,16 @@ import { notFound } from 'next/navigation'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Disc from '@/components/Disc'
 import Name from '@/components/Name'
-import { categoryList, findItem, getCategory, itemPath, matchupPath } from '@/lib/categories'
+import {
+  categoryList,
+  cityPath,
+  findItem,
+  getCategory,
+  itemPath,
+  matchupPath,
+} from '@/lib/categories'
+import { getCity } from '@/lib/cities'
+import { directionsUrl } from '@/lib/items'
 import { DIRECT_VOTES, split } from '@/lib/reveal'
 import { getMatchups, getStandings } from '@/lib/standings'
 import { formatCount, titleCase } from '@/lib/text'
@@ -23,17 +32,20 @@ async function load(params: PageProps<'/[category]/[slug]'>['params']) {
   const category = getCategory(key)
   const item = category && findItem(category, slug)
   if (!category || !item) notFound()
-  const standings = await getStandings(category)
+  const city = getCity(item.city)
+  const standings = await getStandings(category, city?.key)
   const ranked = standings.items.find((entry) => entry.id === item.id)!
-  return { category, standings, ranked }
+  // "fast food fries" nationally, "fries in Los Angeles" on a city board.
+  const scope = city ? `${category.many} in ${city.name}` : category.plural
+  return { category, city, standings, ranked, scope }
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<'/[category]/[slug]'>): Promise<Metadata> {
-  const { category, standings, ranked } = await load(params)
-  const title = `${ranked.fullName}: Ranked #${ranked.rank} of ${standings.items.length} ${titleCase(category.plural)}`
-  const description = `${ranked.fullName} rank #${ranked.rank} of ${standings.items.length} ${category.plural} on FryRanker after ${formatCount(ranked.battles)} head-to-head votes. ${ranked.note}`
+  const { category, standings, ranked, scope } = await load(params)
+  const title = `${ranked.fullName}: Ranked #${ranked.rank} of ${standings.items.length} ${titleCase(scope)}`
+  const description = `${ranked.fullName} rank #${ranked.rank} of ${standings.items.length} ${scope} on FryRanker after ${formatCount(ranked.battles)} head-to-head votes. ${ranked.note}`
   const path = itemPath(category, ranked)
   return {
     title,
@@ -44,7 +56,7 @@ export async function generateMetadata({
 }
 
 export default async function ItemPage({ params }: PageProps<'/[category]/[slug]'>) {
-  const { category, standings, ranked } = await load(params)
+  const { category, city, standings, ranked, scope } = await load(params)
   const matchups = await getMatchups(category)
   const total = standings.items.length
 
@@ -64,6 +76,7 @@ export default async function ItemPage({ params }: PageProps<'/[category]/[slug]
       <Breadcrumbs
         trail={[
           { name: category.navLabel, href: category.home },
+          ...(city ? [{ name: city.name, href: cityPath(category, city) }] : []),
           { name: ranked.name, href: itemPath(category, ranked) },
         ]}
       />
@@ -73,7 +86,7 @@ export default async function ItemPage({ params }: PageProps<'/[category]/[slug]
             <Disc category={category} item={ranked} />
             <div>
               <p className="rank">
-                #{ranked.rank} of {total} {category.plural}
+                #{ranked.rank} of {total} {scope}
               </p>
               <h1 className="cond">
                 <Name text={ranked.fullName} />
@@ -123,7 +136,22 @@ export default async function ItemPage({ params }: PageProps<'/[category]/[slug]
             <p>{ranked.note}</p>
           </section>
 
-          <a className="btn primary" href={`${category.home}?with=${ranked.slug}`}>
+          {ranked.place && (
+            <section className="order-ticket">
+              <h2 className="cond">Where to get them</h2>
+              <p>
+                {ranked.place.address} · {ranked.place.neighborhood}
+              </p>
+              <a className="btn" href={directionsUrl(ranked)} target="_blank" rel="noopener">
+                Get directions
+              </a>
+            </section>
+          )}
+
+          <a
+            className="btn primary"
+            href={`${city ? cityPath(category, city) : category.home}?with=${ranked.slug}`}
+          >
             Vote on {ranked.name}
           </a>
         </div>

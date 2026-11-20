@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { categoryList, itemPath, matchupPath } from '@/lib/categories'
+import { categoryList, citiesFor, cityPath, itemPath, matchupPath } from '@/lib/categories'
 import { absoluteUrl } from '@/lib/site'
 import { getMatchups, INDEXABLE_MATCHUP_VOTES } from '@/lib/standings'
 
@@ -11,6 +11,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
   for (const category of categoryList) {
     entries.push({ url: absoluteUrl(category.home), changeFrequency: 'hourly', priority: 1 })
+    for (const city of citiesFor(category)) {
+      entries.push({
+        url: absoluteUrl(cityPath(category, city)),
+        changeFrequency: 'hourly',
+        priority: 0.9,
+      })
+    }
     for (const item of category.items) {
       entries.push({
         url: absoluteUrl(itemPath(category, item)),

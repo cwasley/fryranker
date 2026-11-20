@@ -6,7 +6,13 @@ import Disc from '@/components/Disc'
 import Name from '@/components/Name'
 import { findItem, getCategory, itemPath, matchupPath } from '@/lib/categories'
 import { source, split } from '@/lib/reveal'
-import { getMatchups, getStandings, INDEXABLE_MATCHUP_VOTES, type Ranked } from '@/lib/standings'
+import {
+  getMatchups,
+  getStandings,
+  INDEXABLE_MATCHUP_VOTES,
+  scopeOf,
+  type Ranked,
+} from '@/lib/standings'
 import { formatCount } from '@/lib/text'
 import { social } from '@/lib/metadata'
 
@@ -26,7 +32,10 @@ async function load(params: Params) {
   const canonical = matchupPath(category, a, b)
   if (canonical !== `${category.base}/${slug}/vs/${other}`) permanentRedirect(canonical)
 
-  const [standings, matchups] = await Promise.all([getStandings(category), getMatchups(category)])
+  const [standings, matchups] = await Promise.all([
+    getStandings(category, scopeOf(a, b)),
+    getMatchups(category),
+  ])
   const left = standings.items.find((item) => item.id === a.id)!
   const right = standings.items.find((item) => item.id === b.id)!
   const { wins, losses } = matchups.record(left.id, right.id)
