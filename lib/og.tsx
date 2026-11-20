@@ -155,12 +155,16 @@ export async function ogCard(body: ReactNode, url = 'fryranker.com') {
 export async function monogram(size: number) {
   return new ImageResponse(
     <div
-      style={cond(size * 0.52, {
+      style={cond(size * 1.07, {
         width: '100%',
         height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: size * 0.06,
+        lineHeight: 1,
+        // Measured offsets: they center the visible F and R, whose side bearings and line box
+        // aren't symmetric. Re-measure if the font size changes.
+        paddingTop: size * 0.024,
+        paddingRight: size * 0.046,
         background: C.red,
         color: C.mustard,
         letterSpacing: '-0.01em',
