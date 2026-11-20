@@ -4,8 +4,8 @@ import type { Item } from '../../items'
  * Independent spots, ranked on their city's board alongside the chains. Ids start at 1000 so
  * they never collide with chains. Same rules as chains: never renumber, never change a shipped slug.
  *
- * Los Angeles launch list, checked against best-fries coverage from October 2026 (The Infatuation,
- * Resy, LAist, menus). Re-check a spot is still open before featuring it anywhere.
+ * Los Angeles list, checked against 2025–2026 coverage (The Infatuation, Resy, LAist, Long Beach
+ * press, menus, reviews). Re-check a spot is still open before featuring it anywhere.
  */
 const la = (place: Item['place']) => ({ city: 'los-angeles', place })
 
@@ -158,6 +158,111 @@ export const localFries: Item[] = [
       address: '4515 Sepulveda Blvd, Sherman Oaks, CA 91403',
       lat: 34.15195,
       lng: -118.46705,
+    }),
+  },
+  {
+    id: 1010,
+    slug: 'the-original-tops',
+    name: 'The Original Tops',
+    fullName: 'The Original Tops Chili Cheese Fries',
+    kind: 'Chili Cheese',
+    tags: ['Chili cheese', 'Stays crispy', 'Grilled onions', 'Pasadena classic'],
+    note: 'Pasadena chili cheese fries that somehow stay crisp under all that chili.',
+    ...la({
+      neighborhood: 'East Pasadena',
+      address: '3838 E Colorado Blvd, Pasadena, CA 91107',
+      lat: 34.14687,
+      lng: -118.0695,
+    }),
+  },
+  {
+    id: 1011,
+    slug: 'lucky-boy',
+    name: 'Lucky Boy',
+    fullName: 'Lucky Boy Chili Cheese Fries',
+    kind: 'Chili Cheese',
+    tags: ['Chili cheese', 'Pastrami add-on', 'Huge portions', 'Pasadena staple'],
+    note: 'A Pasadena institution. Chili cheese fries by the heap, with pastrami if you dare.',
+    ...la({
+      neighborhood: 'Pasadena',
+      address: '640 S Arroyo Pkwy, Pasadena, CA 91105',
+      lat: 34.13437,
+      lng: -118.14726,
+    }),
+  },
+  {
+    id: 1012,
+    slug: 'proudly-serving',
+    name: 'Proudly Serving',
+    fullName: 'Proudly Serving Chili Cheese Fries',
+    kind: 'Chili Cheese',
+    tags: ['Duck fat crisped', 'Thick + craggy', 'Chili cheese', 'Burger stand'],
+    note: 'Thick, craggy fries crisped in duck fat, then buried in chili and cheese.',
+    ...la({
+      neighborhood: 'Long Beach',
+      address: '6332 E Pacific Coast Hwy, Long Beach, CA 90803',
+      lat: 33.76054,
+      lng: -118.11355,
+    }),
+  },
+  {
+    id: 1013,
+    slug: 'bixby-classic-burger',
+    name: 'Bixby Classic Burger',
+    fullName: 'Bixby Classic Burger Chili Cheese Fries',
+    kind: 'Chili Cheese',
+    tags: ['Chili cheese', 'Drive-thru', 'Budget pick', 'Local favorite'],
+    note: 'A Bixby Knolls drive-thru whose chili cheese fries locals swear by.',
+    ...la({
+      neighborhood: 'Bixby Knolls, Long Beach',
+      address: '4001 Orange Ave, Long Beach, CA 90807',
+      lat: 33.83145,
+      lng: -118.17636,
+    }),
+  },
+  {
+    id: 1014,
+    slug: 'mvps-grill-and-patio',
+    name: "MVP's Grill",
+    fullName: "MVP's Grill & Patio Cajun Fries",
+    kind: 'Cajun Seasoned',
+    tags: ['Cajun dusted', 'Big portions', 'Cajun cheese option', 'Ranch on side'],
+    note: 'A 4th Street staple. The move is the fries, heavy on the Cajun spice.',
+    ...la({
+      neighborhood: '4th Street, Long Beach',
+      address: '2742 E 4th St, Long Beach, CA 90814',
+      lat: 33.77165,
+      lng: -118.15956,
+    }),
+  },
+  {
+    id: 1015,
+    slug: 'fathers-office',
+    name: "Father's Office",
+    fullName: "Father's Office Fries",
+    kind: 'Shoestring',
+    tags: ['Skin-on shoestring', 'Garlic aioli', 'Sweet potato too', 'Burger bar'],
+    note: 'Skinny skin-on fries with garlic aioli next to one of LA’s most famous burgers.',
+    ...la({
+      neighborhood: 'Culver City',
+      address: '3229 Helms Ave, Los Angeles, CA 90034',
+      lat: 34.03042,
+      lng: -118.38458,
+    }),
+  },
+  {
+    id: 1016,
+    slug: 'dinos-burgers-hawthorne',
+    name: 'Dinos Burgers',
+    fullName: 'Dinos Burgers Asada Chili Cheese Fries',
+    kind: 'Carne Asada',
+    tags: ['Carne asada', 'Chili + cheese', 'Top seller', 'Fully loaded'],
+    note: 'A Hawthorne stand since 1998. The asada chili cheese fries are a top seller.',
+    ...la({
+      neighborhood: 'Hawthorne',
+      address: '13128 S Inglewood Ave, Hawthorne, CA 90250',
+      lat: 33.9129,
+      lng: -118.36119,
     }),
   },
 ]

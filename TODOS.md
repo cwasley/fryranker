@@ -61,6 +61,8 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 - LA launched on `preview` with 10 hand-checked spots (Nov 2026). Visitors can suggest spots; review weekly with `yarn spots:prod`. Turn on place search by adding `FOURSQUARE_API_KEY` in Vercel (Preview and Production). Then more cities.
 - Nearby discovery: recommend spots on the visitor's city board that match their taste profile.
 - Re-check the LA list every few months; spots close.
+- LA candidates held back until someone confirms them (Nov 2026 research): The Oinkster (Eagle Rock; website parked, reviews say open), Louis Burgers III (Long Beach; check the spelling on the sign), Love Hour (Koreatown; fry menu may have changed), Humble Potato (Mar Vista; no recent source), Happies Hand Made (Arts District; 2025 sources only), The Ordinarie (Long Beach; new chef, menu changed), The Win~Dow (Belmont Shore; 7+ locations, mixed fry reviews), HiHo Cheeseburger (Santa Monica).
+- Gaps: Burbank/Glendale, Boyle Heights/East LA, Alhambra/San Gabriel, Inglewood, Torrance/Gardena.
 
 ## Housekeeping (not scored)
 
