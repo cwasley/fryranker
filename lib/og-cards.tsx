@@ -1,6 +1,6 @@
 import type { Category } from './categories'
 import { isLocal, type Item } from './items'
-import { C, cond, Disc, ogCard, Plate } from './og'
+import { C, cond, Disc, ogCard, Plate, storyCard } from './og'
 import { split } from './reveal'
 import { getCity, type City } from './cities'
 import { getMatchups, getStandings, scopeOf } from './standings'
@@ -183,6 +183,109 @@ export function topCard(category: Category, picks: Item[]) {
         <div style={cond(104)}>What&apos;s yours?</div>
         <div style={{ display: 'flex', fontSize: 34, fontWeight: 600, color: C.soft }}>
           Pick between two {category.many} at a time.
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** A visitor's top 5 as a receipt, sized for a story. Drawn from the share link alone. */
+export function storyTopCard(category: Category, picks: Item[]) {
+  const profile = category
+    .insights(picks)
+    .slice(0, 2)
+    .map((insight) => insight.value)
+  return storyCard(
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 22,
+          marginTop: 30,
+          background: C.receipt,
+          border: `6px solid ${C.ink}`,
+          boxShadow: `16px 16px 0 ${C.ink}`,
+          padding: '48px 50px 44px',
+          transform: 'rotate(-1.5deg)',
+        }}
+      >
+        <div style={cond(92, { justifyContent: 'center' })}>My fry order</div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            fontSize: 30,
+            fontWeight: 600,
+            color: C.soft,
+          }}
+        >
+          My top 5 {category.many}, ranked
+        </div>
+        <div style={{ display: 'flex', borderTop: `4px dashed ${C.ink}`, margin: '8px 0' }} />
+        {picks.map((item, i) => (
+          <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            <div
+              style={cond(54, {
+                width: 74,
+                height: 74,
+                borderRadius: 74,
+                background: i === 0 ? C.red : C.ink,
+                color: i === 0 ? C.mustard : C.paper,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingTop: 6,
+                flexShrink: 0,
+              })}
+            >
+              {i + 1}
+            </div>
+            <Disc category={category} item={item} size={96} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+              <div style={cond(item.name.length > 16 ? 50 : 62)}>{item.name}</div>
+              <div style={{ display: 'flex', fontSize: 26, fontWeight: 600, color: C.soft }}>
+                {item.kind}
+              </div>
+            </div>
+          </div>
+        ))}
+        <div style={{ display: 'flex', borderTop: `4px dashed ${C.ink}`, margin: '8px 0' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', fontSize: 28, fontWeight: 800, color: C.soft }}>
+            YOUR ORDER
+          </div>
+          <div style={cond(56, { color: C.red, textAlign: 'center' })}>{profile.join(' · ')}</div>
+        </div>
+        <div
+          style={{ display: 'flex', justifyContent: 'center', gap: 6, height: 70, marginTop: 10 }}
+        >
+          {Array.from({ length: 40 }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                width: i % 3 === 0 ? 8 : 4,
+                height: `${40 + ((i * 37) % 60)}%`,
+                background: C.ink,
+                alignSelf: 'flex-end',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 14,
+          marginTop: 'auto',
+          paddingBottom: 90,
+        }}
+      >
+        <div style={cond(110)}>What&apos;s yours?</div>
+        <div style={{ display: 'flex', fontSize: 40, fontWeight: 800, color: C.soft }}>
+          fryranker.com
         </div>
       </div>
     </div>

@@ -151,6 +151,32 @@ export async function ogCard(body: ReactNode, url = 'fryranker.com') {
   )
 }
 
+export const STORY_SIZE = { width: 1080, height: 1920 }
+
+/** A full-screen card for Instagram and TikTok stories. */
+export async function storyCard(body: ReactNode) {
+  return new ImageResponse(
+    <div
+      style={flex({
+        width: '100%',
+        height: '100%',
+        flexDirection: 'column',
+        background: C.paper,
+        color: C.ink,
+        fontFamily: 'Archivo',
+      })}
+    >
+      <Checker />
+      <div style={flex({ justifyContent: 'center', padding: '90px 0 0' })}>
+        <Logo size={84} />
+      </div>
+      <div style={flex({ flex: 1, flexDirection: 'column', padding: '40px 80px 0' })}>{body}</div>
+      <Checker />
+    </div>,
+    { ...STORY_SIZE, fonts: await loadFonts() }
+  )
+}
+
 /** The L1 sign as a square app icon: mustard "FR" on the red sign. */
 export async function monogram(size: number) {
   return new ImageResponse(

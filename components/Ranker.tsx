@@ -22,7 +22,7 @@ import { readIds, SPOTS_EVENT, visitorKeys } from '@/lib/visitor'
 import Barcode from './Barcode'
 import Disc from './Disc'
 import Name from './Name'
-import ShareButton from './ShareButton'
+import ShareButton, { ShareImageButton } from './ShareButton'
 
 type Props = {
   categoryKey: Category['key']
@@ -613,7 +613,7 @@ function Receipt({ category, round, top, onAgain, onReset }: ReceiptProps) {
           </button>
           <ShareButton
             className="btn"
-            label="Share receipt"
+            label="Share link"
             path={sharePath(
               category,
               top.map((item) => item.id)
@@ -621,6 +621,17 @@ function Receipt({ category, round, top, onAgain, onReset }: ReceiptProps) {
             title={`My top 5 ${category.many}`}
             text={`My top 5 ${category.many}: ${list(top.map((item) => item.name))}. What's yours?`}
           />
+          {top.length === 5 && (
+            <ShareImageButton
+              className="btn"
+              label="Share as image"
+              path={sharePath(
+                category,
+                top.map((item) => item.id)
+              )}
+              text={`My top 5 ${category.many}. What's yours? fryranker.com`}
+            />
+          )}
         </div>
         <button type="button" className="start-over" onClick={onReset}>
           Start my rankings over

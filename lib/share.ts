@@ -9,7 +9,7 @@ export const sharePath = (category: Category, ids: number[]) =>
 /** The items a share link names, or undefined if the link isn't one we would have made. */
 export function parseShare(category: Category, raw: string): Item[] | undefined {
   const parts = raw.split('-')
-  if (parts.length !== SHARE_SIZE || parts.some((part) => !/^\d{1,3}$/.test(part))) return undefined
+  if (parts.length !== SHARE_SIZE || parts.some((part) => !/^\d{1,4}$/.test(part))) return undefined
   const items = parts.map((part) => category.items.find((item) => item.id === Number(part)))
   if (items.some((item) => !item)) return undefined
   if (new Set(parts).size !== parts.length) return undefined

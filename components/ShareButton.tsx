@@ -28,3 +28,48 @@ export default function ShareButton({ path, title, text, label, className }: Pro
     </button>
   )
 }
+
+type ImageProps = { path: string; text: string; label: string; className: string }
+
+/**
+ * Shares the story-size receipt image (`<share path>/story`). Phones get the share sheet with the
+ * PNG attached; anywhere that can't share files downloads it instead.
+ */
+export function ShareImageButton({ path, text, label, className }: ImageProps) {
+  const [state, setState] = useState<'idle' | 'busy' | 'saved' | 'failed'>('idle')
+
+  const share = async () => {
+    setState('busy')
+    try {
+      const res = await fetch(`${path}/story`)
+      if (!res.ok) throw new Error(`Image failed: ${res.status}`)
+      const blob = await res.blob()
+      const file = new File([blob], 'my-fry-order.png', { type: 'image/png' })
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], text }).catch(() => {})
+        setState('idle')
+        return
+      }
+      const url = URL.createObjectURL(blob)
+      const link = Object.assign(document.createElement('a'), { href: url, download: file.name })
+      link.click()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setState('saved')
+    } catch {
+      setState('failed')
+    }
+    setTimeout(() => setState('idle'), 2500)
+  }
+
+  return (
+    <button type="button" className={className} onClick={share} disabled={state === 'busy'}>
+      {state === 'busy'
+        ? 'Making image…'
+        : state === 'saved'
+          ? 'Image saved!'
+          : state === 'failed'
+            ? 'Try again'
+            : label}
+    </button>
+  )
+}
