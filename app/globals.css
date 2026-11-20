@@ -1456,3 +1456,139 @@ footer.foot a {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.suggest-wrap {
+  margin: 22px 0 0;
+  text-align: center;
+}
+
+.suggest-wrap > p {
+  margin: 0 0 10px;
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.suggest {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  border: var(--line) solid var(--ink);
+  border-radius: 14px;
+  background: var(--card);
+  text-align: left;
+  display: grid;
+  gap: 12px;
+}
+
+.suggest h3 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.suggest label {
+  display: grid;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.suggest label small {
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.suggest input,
+.suggest select,
+.suggest textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+}
+
+.suggest textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.suggest .results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.suggest .results button,
+.suggest .picked {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggest .results li + li button {
+  border-top: 1px solid var(--soft);
+}
+
+.suggest .picked {
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  cursor: default;
+}
+
+.suggest .picked small,
+.suggest .results small {
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.suggest .picked button {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--red);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.suggest .row-actions {
+  margin-top: 4px;
+}
+
+.suggest .hp {
+  position: absolute;
+  left: -9999px;
+}
+
+.suggest-error {
+  margin: 0;
+  color: var(--red);
+  font-weight: 700;
+}
+
+.suggest-done {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 14px;
+  border: var(--line) solid var(--ink);
+  border-radius: 14px;
+  background: var(--mustard);
+  color: #22140c;
+  font-weight: 800;
+}

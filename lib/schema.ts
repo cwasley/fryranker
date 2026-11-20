@@ -69,6 +69,23 @@ export async function setupDatabase(sql: Sql, log: (line: string) => void = cons
       )
     `,
     sql`CREATE INDEX IF NOT EXISTS votes_category_created_at_idx ON votes (category, created_at DESC)`,
+    // Spots visitors suggest for a city board. Nothing here is public until someone adds the spot
+    // to `lib/data/local/` by hand; `yarn spots` lists what's waiting.
+    sql`
+      CREATE TABLE IF NOT EXISTS spot_suggestions (
+        id BIGSERIAL PRIMARY KEY,
+        category TEXT NOT NULL,
+        city TEXT NOT NULL,
+        name TEXT NOT NULL,
+        neighborhood TEXT,
+        address TEXT,
+        place_id TEXT,
+        kind TEXT NOT NULL,
+        note TEXT,
+        status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'added', 'rejected')),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `,
   ])
   log('Tables ready.')
 

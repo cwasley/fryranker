@@ -11,7 +11,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:setup": "tsx --env-file=.env.local scripts/setup-db.ts",
-    "db:setup:prod": "tsx --env-file=.env.local scripts/setup-db.ts --prod"
+    "db:setup:prod": "tsx --env-file=.env.local scripts/setup-db.ts --prod",
+    "spots": "tsx --env-file=.env.local scripts/spots.ts",
+    "spots:prod": "tsx --env-file=.env.local scripts/spots.ts --prod"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

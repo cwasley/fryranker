@@ -58,7 +58,7 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 
 ## Local spots, next steps (not scored yet)
 
-- LA launched on `preview` with 10 hand-checked spots (Nov 2026). Next: let visitors add spots through a places search (needs a Foursquare or Google Places account), then more cities.
+- LA launched on `preview` with 10 hand-checked spots (Nov 2026). Visitors can suggest spots; review weekly with `yarn spots:prod`. Turn on place search by adding `FOURSQUARE_API_KEY` in Vercel (Preview and Production). Then more cities.
 - Nearby discovery: recommend spots on the visitor's city board that match their taste profile.
 - Re-check the LA list every few months; spots close.
 

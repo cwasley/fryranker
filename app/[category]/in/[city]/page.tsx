@@ -5,10 +5,12 @@ import Breadcrumbs from '@/components/Breadcrumbs'
 import JsonLd from '@/components/JsonLd'
 import MenuBoard from '@/components/MenuBoard'
 import Ranker from '@/components/Ranker'
+import SuggestSpot from '@/components/SuggestSpot'
 import { categoryList, citiesFor, cityPath, getCategory, itemPath } from '@/lib/categories'
 import { getCity } from '@/lib/cities'
 import { directionsUrl, isLocal } from '@/lib/items'
 import { social } from '@/lib/metadata'
+import { placeSearchEnabled } from '@/lib/places'
 import { absoluteUrl } from '@/lib/site'
 import { getMatchups, getStandings } from '@/lib/standings'
 import { formatCount, titleCase } from '@/lib/text'
@@ -111,8 +113,16 @@ export default async function CityPage({ params }: { params: Params }) {
             </li>
           ))}
         </ul>
+        <div className="suggest-wrap">
+          <p>Missing a spot? Tell us and we&apos;ll check it out.</p>
+          <SuggestSpot
+            categoryKey={category.key}
+            cityKey={city.key}
+            cityName={city.name}
+            search={placeSearchEnabled()}
+          />
+        </div>
         <p className="about">
-          Missing a spot? More cities and a way to add places are coming.{' '}
           <Link href="/how-it-works">How the rankings work</Link>
         </p>
       </section>

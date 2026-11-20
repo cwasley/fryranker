@@ -12,7 +12,7 @@ const DEFAULT_LIMIT_PER_MINUTE = 30
  */
 const DEFAULT_IP_LIMIT_PER_MINUTE = 120
 
-function clientKeys(request: Request, scope: string) {
+export function clientKeys(request: Request, scope: string) {
   // On Vercel, x-forwarded-for is set by the platform, so clients can't spoof it.
   const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
   const ip = forwarded || request.headers.get('x-real-ip')?.trim() || 'unknown'
