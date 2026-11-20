@@ -1862,7 +1862,7 @@ footer.foot a {
 .map-card {
   display: grid;
   gap: 6px;
-  min-width: 200px;
+  min-width: 250px;
   padding: 12px 14px 14px;
   color: #22140c;
 }
@@ -1900,7 +1900,7 @@ footer.foot a {
 
 .map-card .acts {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
   margin-top: 4px;
 }
