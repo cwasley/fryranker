@@ -38,7 +38,7 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 5. **Guard the vote endpoint.** If spam shows up, add Vercel BotID (invisible, no CAPTCHA) to `/api/vote` alone, rather than challenging the whole site and breaking previews again.
 6. **Desktop keyboard shortcuts.** ← and → to pick, space for "Too close to call". The old site had these before the mobile-first pass.
 7. **Search copy on the home page.** A short, visible intro ("36,000 votes say McDonald's has the best fast food fries…"), a small FAQ ("Who has the best fast food fries?"), and a refreshed date. The menu board is already in the HTML; this gives search engines a summary to quote.
-8. **Daily matchup and streaks.** One featured pair a day for everyone, with yesterday's result shown, plus a streak counter kept on the device. It's the strongest reason to come back daily, Wordle-style.
+8. **Daily matchup and streaks.** Done on `preview` (Nov 2026): one chain-vs-chain pair a day for everyone (`lib/daily.ts`, LA midnight), today's split after voting, yesterday's result from the `votes` log once it has 5+ votes, and a streak kept on the device. Later: a reminder (needs email or push) so streaks survive.
 9. **Share the receipt as an image.** Done on `preview` (Nov 2026): "Share as image" on the receipt shares `/top/<category>/<ids>/story`, a 1080×1920 PNG. Still to check on a real iPhone and Android phone that the share sheet attaches it.
 10. **Rank movement arrows.** "▲2 this week" on the menu board, computed from the `votes` log. Needs about two weeks of votes first.
 11. **Fry Madness bracket.** A March bracket event with rounds that open each day. It's a seasonal traffic spike, and a natural first thing to sponsor (see Money).
