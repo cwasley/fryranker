@@ -63,7 +63,9 @@ export async function itemCard(category: Category, item: Item) {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 16 }}>
         <Plate>
           {ranked.isNew
-            ? `New on the ${getCity(item.city)?.short} board`
+            ? item.city
+              ? `New on the ${getCity(item.city)?.short} board`
+              : 'New on the board'
             : `#${ranked.rank} of ${standings.ranked} ${
                 item.city ? `${category.many} in ${getCity(item.city)?.short}` : category.plural
               }`}

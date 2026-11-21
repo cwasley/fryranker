@@ -9,11 +9,11 @@ export type Ranked = Item & {
   battles: number
   /** Position among the board's established items. New spots come after them. */
   rank: number
-  /** A local spot with too few votes for a rank yet. */
+  /** Too few votes for a rank yet (new chains and local spots alike). */
   isNew: boolean
 }
 
-/** Local spots show as "New" instead of a rank until they have this many votes. */
+/** Items show as "New" instead of a rank until they have this many votes. */
 export const NEW_UNTIL = 15
 
 /** "#4", or "New" for a spot still being ranked. */
@@ -55,7 +55,7 @@ export const getStandings = cache(
     const totalVotes = Math.round(withScores.reduce((sum, item) => sum + item.battles, 0) / 2)
     const items = withScores
       .filter((item) => item.city === undefined || item.city === cityKey)
-      .map((item) => ({ ...item, isNew: item.city !== undefined && item.battles < NEW_UNTIL }))
+      .map((item) => ({ ...item, isNew: item.battles < NEW_UNTIL }))
       .sort(
         (a, b) =>
           Number(a.isNew) - Number(b.isNew) ||
