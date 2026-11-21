@@ -59,7 +59,7 @@ Ranked by RICE score: **Reach × Impact × Confidence ÷ Effort**.
 ## Local spots, next steps (not scored yet)
 
 - LA launched on `preview` with 10 hand-checked spots (Nov 2026). Visitors can suggest spots; review weekly with `yarn spots:prod`. Turn on place search by adding `FOURSQUARE_API_KEY` in Vercel (Preview and Production). Then more cities.
-- Nearby discovery: recommend spots on the visitor's city board that match their taste profile.
+- Nearby discovery: first version done on `preview` (Nov 2026). `/me` suggests LA spots that share traits with the visitor's top 5 (`lib/recommend.ts`). Later: "people who pick like you loved" once there are enough votes.
 - Re-check the LA list every few months; spots close.
 - LA candidates still held (Nov 2026 checks): Louis Burgers III (Long Beach; only a May 2026 Yelp snippet shows it open, fry details from 2014) and Dirt Dog (Gardena; no 2026 source for that branch, call first). Dropped after checking: Happies Hand Made (closed 2025), Love Hour (seasoned fries off the menu), Humble Potato (signature fries unconfirmed), The Ordinarie (menu keeps changing), The Win~Dow (fries not a draw).
 - Gaps with nothing that cleared the bar yet: San Gabriel Valley (Alhambra, San Gabriel, Monterey Park) and Inglewood.
