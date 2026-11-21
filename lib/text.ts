@@ -1,5 +1,8 @@
 export const formatCount = (n: number) => n.toLocaleString('en-US')
 
+/** "1 vote", "2,401 votes". */
+export const votes = (n: number) => `${formatCount(n)} ${n === 1 ? 'vote' : 'votes'}`
+
 /** 36,512 → "36,000+"; small counts stay exact. */
 export const roundedCount = (n: number) =>
   n >= 1000 ? `${formatCount(Math.floor(n / 1000) * 1000)}+` : formatCount(n)

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { itemPath, type Category } from '@/lib/categories'
 import type { Ranked } from '@/lib/standings'
-import { formatCount } from '@/lib/text'
+import { votes } from '@/lib/text'
 import Name from './Name'
 
 type Props = {
@@ -49,7 +49,7 @@ export default function MenuBoard({
                 <small>pts</small>
               </span>
               <span className="k">
-                {item.kind} · {formatCount(item.battles)} votes
+                {item.kind} · {votes(item.battles)}
               </span>
             </Link>
           </li>
