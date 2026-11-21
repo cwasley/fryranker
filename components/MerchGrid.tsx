@@ -99,7 +99,7 @@ function Print({ design, top, profile }: { design: Design; top: string[]; profil
     )
   }
   return (
-    <div className="print receipt" style={style}>
+    <div className="print slip" style={style}>
       <b className="cond">My fry order</b>
       <ol>
         {top.map((name) => (
