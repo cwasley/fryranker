@@ -10,7 +10,8 @@ export default function SiteHeader() {
     categoryList.find(
       (c) => c.home !== '/' && (pathname.startsWith(c.base) || pathname.startsWith(`/top/${c.key}`))
     ) ?? categories.fries
-  const onPick = pathname === active.home
+  const onMine = pathname === '/me'
+  const onPick = !onMine && pathname === active.home
   const onMenu = pathname.startsWith(`${active.base}/`)
 
   return (
@@ -26,6 +27,9 @@ export default function SiteHeader() {
           </Link>
           <Link href={`${active.home}#menu`} aria-current={onMenu ? 'page' : undefined}>
             Menu
+          </Link>
+          <Link href="/me" aria-current={onMine ? 'page' : undefined}>
+            Mine
           </Link>
         </nav>
       </div>

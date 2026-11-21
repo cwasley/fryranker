@@ -2050,3 +2050,163 @@ footer.foot a {
   font-weight: 600;
   opacity: 0.85;
 }
+
+/* My fries */
+.me {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.me.placeholder {
+  min-height: 60vh;
+}
+
+.me-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+.me-card,
+.me-empty {
+  margin: 0 0 18px;
+  padding: 16px;
+  border: var(--line) solid var(--ink);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.me-card h2,
+.me-empty h2 {
+  margin: 0 0 10px;
+  font-size: 28px;
+}
+
+.me-empty {
+  text-align: center;
+}
+
+.me-empty p,
+.me-note {
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.me-note {
+  margin: 10px 0 0;
+  font-size: 14px;
+}
+
+.me-profile {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.me-profile div {
+  padding: 10px 12px;
+  border: 2px dashed var(--ink);
+  border-radius: 12px;
+}
+
+.me-profile small {
+  display: block;
+  color: var(--soft);
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.me-profile b {
+  font-size: 24px;
+  color: var(--red);
+}
+
+.me-try {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.me-try li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.me-try .disc {
+  width: 56px;
+  padding: 7px;
+  border-width: 2px;
+}
+
+.me-try b {
+  font-size: 18px;
+}
+
+.me-try small {
+  display: block;
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.me-try p {
+  margin: 4px 0 6px;
+  font-weight: 600;
+}
+
+.me-try-acts {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.me-try-acts a,
+.me-try-acts button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--red);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.me-rank {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.me-rank li {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1.5px dashed var(--soft);
+}
+
+.me-rank li:last-child {
+  border-bottom: 0;
+}
+
+.me-rank .n {
+  font-size: 22px;
+  color: var(--red);
+}
+
+.me-rank a {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.me-rank small {
+  color: var(--soft);
+  font-weight: 700;
+  white-space: nowrap;
+}

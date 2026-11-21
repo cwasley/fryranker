@@ -18,7 +18,7 @@ import { sharePath } from '@/lib/share'
 import { rankLabel, type MatchupRow, type Ranked } from '@/lib/standings'
 import { rankedTaste, useTaste } from '@/lib/taste'
 import { list } from '@/lib/text'
-import { readIds, SPOTS_EVENT, visitorKeys } from '@/lib/visitor'
+import { readIds, SPOTS_EVENT, visitorKeys, writeIds } from '@/lib/visitor'
 import Barcode from './Barcode'
 import Disc from './Disc'
 import Name from './Name'
@@ -68,15 +68,6 @@ function pairFromUrl(pool: Item[], skip: Set<number>, cityBoard: boolean): Pair 
   window.history.replaceState(null, '', window.location.pathname)
   if (a !== undefined && b !== undefined && a !== b) return [a, b]
   return randomPair(pool, skip, cityBoard, a ?? b ?? only)
-}
-
-const writeIds = (key: string, ids: Set<number>) => {
-  try {
-    localStorage.setItem(key, JSON.stringify([...ids]))
-  } catch {
-    // Storage blocked: remember for this visit only.
-  }
-  window.dispatchEvent(new Event(SPOTS_EVENT))
 }
 
 /**

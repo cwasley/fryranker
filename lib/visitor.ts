@@ -13,6 +13,15 @@ export const visitorKeys = (category: Category) => ({
   asked: `${category.storageKey}_asked`,
 })
 
+export function writeIds(key: string, ids: Set<number>) {
+  try {
+    localStorage.setItem(key, JSON.stringify([...ids]))
+  } catch {
+    // Storage blocked: remember for this visit only.
+  }
+  window.dispatchEvent(new Event(SPOTS_EVENT))
+}
+
 export function readIds(key: string): Set<number> | null {
   try {
     const raw = localStorage.getItem(key)
