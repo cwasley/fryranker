@@ -15,6 +15,7 @@ import {
 import { getCity } from '@/lib/cities'
 import { directionsUrl } from '@/lib/items'
 import { DIRECT_VOTES, split } from '@/lib/reveal'
+import { getMovement, movementLabel } from '@/lib/movement'
 import { getMatchups, getStandings, NEW_UNTIL, rankLabel } from '@/lib/standings'
 import { formatCount, titleCase } from '@/lib/text'
 import { social } from '@/lib/metadata'
@@ -65,6 +66,7 @@ export async function generateMetadata({
 export default async function ItemPage({ params }: PageProps<'/[category]/[slug]'>) {
   const { category, city, standings, ranked, scope } = await load(params)
   const matchups = await getMatchups(category)
+  const moved = (await getMovement(category, standings.items)).get(ranked.id)
   const total = standings.ranked
   const toGo = NEW_UNTIL - ranked.battles
 
@@ -97,6 +99,12 @@ export default async function ItemPage({ params }: PageProps<'/[category]/[slug]
                 {ranked.isNew
                   ? `New on the board · ${scope}`
                   : `#${ranked.rank} of ${total} ${scope}`}
+                {moved ? (
+                  <span className={`mv ${moved > 0 ? 'up' : 'down'}`}>
+                    {' '}
+                    {movementLabel(moved)} this week
+                  </span>
+                ) : null}
               </p>
               <h1 className="cond">
                 <Name text={ranked.fullName} />

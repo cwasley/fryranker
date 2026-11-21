@@ -27,7 +27,7 @@ export function clientKeys(request: Request, scope: string) {
 
 type Keys = ReturnType<typeof clientKeys>
 
-/** Everything one vote writes, in order. The fourth statement returns the two updated rows. */
+/** Everything one vote writes, in order. The third statement returns the two updated rows. */
 export function voteStatements(
   sql: ReturnType<typeof db>,
   category: Category,
@@ -52,6 +52,11 @@ export function voteStatements(
         FROM items w, items l
         WHERE w.category = ${category.key} AND w.id = ${winnerId}
           AND l.category = ${category.key} AND l.id = ${loserId}
+      ),
+      -- The vote log keeps the points that changed hands, so standings can be rewound in time.
+      logged AS (
+        INSERT INTO votes (category, winner, loser, delta)
+        SELECT ${category.key}, ${winnerId}, ${loserId}, delta FROM d
       )
       UPDATE items t
       SET score = t.score + CASE WHEN t.id = ${winnerId} THEN d.delta ELSE -d.delta END,
@@ -69,7 +74,6 @@ export function voteStatements(
       ON CONFLICT (category, a, b) DO UPDATE
       SET a_wins = matchups.a_wins + EXCLUDED.a_wins, b_wins = matchups.b_wins + EXCLUDED.b_wins
     `,
-    sql`INSERT INTO votes (category, winner, loser) VALUES (${category.key}, ${winnerId}, ${loserId})`,
   ]
 }
 

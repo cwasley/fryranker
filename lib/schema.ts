@@ -69,6 +69,8 @@ export async function setupDatabase(sql: Sql, log: (line: string) => void = cons
       )
     `,
     sql`CREATE INDEX IF NOT EXISTS votes_category_created_at_idx ON votes (category, created_at DESC)`,
+    // Points the winner gained (and the loser gave up). Null on votes from before it was recorded.
+    sql`ALTER TABLE votes ADD COLUMN IF NOT EXISTS delta INTEGER`,
     // "Want this?" taps on merch designs, one row per design. Anonymous: no visitor data stored.
     sql`
       CREATE TABLE IF NOT EXISTS merch_interest (

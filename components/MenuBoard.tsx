@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { itemPath, type Category } from '@/lib/categories'
 import type { Ranked } from '@/lib/standings'
+import { movementLabel } from '@/lib/movement'
 import { votes } from '@/lib/text'
 import Name from './Name'
 
@@ -9,6 +10,8 @@ type Props = {
   items: Ranked[]
   title: string
   sub?: string
+  /** Places each item moved this week; positive is up. */
+  moves?: Map<number, number>
   className?: string
   children?: React.ReactNode
 }
@@ -18,6 +21,7 @@ export default function MenuBoard({
   items,
   title,
   sub,
+  moves,
   className = '',
   children,
 }: Props) {
@@ -38,7 +42,14 @@ export default function MenuBoard({
               .join(' ')}
           >
             <Link href={itemPath(category, item)}>
-              <span className="n cond">{item.isNew ? 'New' : item.rank}</span>
+              <span className="n cond">
+                {item.isNew ? 'New' : item.rank}
+                {moves?.get(item.id) ? (
+                  <small className={`mv ${moves.get(item.id)! > 0 ? 'up' : 'down'}`}>
+                    {movementLabel(moves.get(item.id))}
+                  </small>
+                ) : null}
+              </span>
               <span className="nm cond">
                 <span>
                   <Name text={item.name} />

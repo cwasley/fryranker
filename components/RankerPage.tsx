@@ -5,6 +5,7 @@ import MenuBoard from '@/components/MenuBoard'
 import Ranker from '@/components/Ranker'
 import { itemPath, type Category } from '@/lib/categories'
 import { absoluteUrl, site } from '@/lib/site'
+import { getMovement } from '@/lib/movement'
 import { getMatchups, getStandings } from '@/lib/standings'
 import { formatCount, list, roundedCount, titleCase } from '@/lib/text'
 import { social } from '@/lib/metadata'
@@ -28,6 +29,7 @@ export default async function RankerPage({ category }: { category: Category }) {
     getMatchups(category),
   ])
   const half = Math.ceil(items.length / 2)
+  const moves = await getMovement(category, items)
 
   return (
     <main className="page">
@@ -46,12 +48,14 @@ export default async function RankerPage({ category }: { category: Category }) {
           <MenuBoard
             category={category}
             items={items.slice(0, half)}
+            moves={moves}
             title="Today's menu"
             sub={`${formatCount(totalVotes)} votes so far. Tap any ${category.one} for its matchups.`}
           />
           <MenuBoard
             category={category}
             items={items.slice(half)}
+            moves={moves}
             title="Also serving"
             sub="Points go up with every win and down with every loss."
           />

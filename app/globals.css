@@ -2405,3 +2405,26 @@ footer.foot a {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+/* Weekly movement */
+.board .n .mv {
+  display: block;
+  font-size: 0.42em;
+  letter-spacing: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.mv.up {
+  color: #2f9e44;
+}
+
+.mv.down {
+  color: var(--red);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .mv.up {
+    color: #69db7c;
+  }
+}

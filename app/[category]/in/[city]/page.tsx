@@ -14,6 +14,7 @@ import { social } from '@/lib/metadata'
 import { placeSearchEnabled } from '@/lib/places'
 import { absoluteUrl } from '@/lib/site'
 import { glyphSvg } from '@/lib/glyphs'
+import { getMovement } from '@/lib/movement'
 import { getMatchups, getStandings, rankLabel } from '@/lib/standings'
 import { visitorKeys } from '@/lib/visitor'
 import { formatCount, titleCase } from '@/lib/text'
@@ -59,6 +60,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function CityPage({ params }: { params: Params }) {
   const { category, city, standings, locals } = await load(params)
   const matchups = await getMatchups(category)
+  const moves = await getMovement(category, standings.items)
   const path = cityPath(category, city)
 
   return (
@@ -89,12 +91,14 @@ export default async function CityPage({ params }: { params: Params }) {
           <MenuBoard
             category={category}
             items={locals}
+            moves={moves}
             title={`${city.short} locals`}
             sub={`Ranked against each other and the chains. Tap a spot for where to find it.`}
           />
           <MenuBoard
             category={category}
             items={standings.items.slice(0, locals.length)}
+            moves={moves}
             title={`${city.short}'s full board`}
             sub={`Locals and chains together, by points. ${formatCount(standings.totalVotes)} votes so far.`}
           />
