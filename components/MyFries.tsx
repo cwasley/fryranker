@@ -11,7 +11,6 @@ import {
   localsIn,
   type Category,
 } from '@/lib/categories'
-import { dayBefore, dayOf } from '@/lib/daily'
 import { directionsUrl, type Item } from '@/lib/items'
 import { suggestSpots } from '@/lib/recommend'
 import { sharePath } from '@/lib/share'
@@ -41,36 +40,20 @@ function useMyRanking(category: Category) {
   )
 }
 
-function readStreak(key: string) {
-  try {
-    const saved = JSON.parse(localStorage.getItem(key) ?? 'null') as {
-      day: string
-      streak: number
-      best: number
-    } | null
-    if (!saved) return { streak: 0, best: 0 }
-    const today = dayOf(new Date())
-    const alive = saved.day === today || saved.day === dayBefore(today)
-    return { streak: alive ? saved.streak : 0, best: saved.best }
-  } catch {
-    return { streak: 0, best: 0 }
-  }
-}
-
 export default function MyFries({ crowd }: Props) {
   const fries = categories.fries
   const mine = useMyRanking(fries)
   const sauces = useMyRanking(categories.sauces)
+  const { taste: friesTaste } = useTaste(fries)
+  const { taste: sauceTaste } = useTaste(categories.sauces)
   const keys = visitorKeys(fries)
   const [ready, setReady] = useState(false)
   const [been, setBeen] = useState<Set<number>>(new Set())
-  const [streak, setStreak] = useState({ streak: 0, best: 0 })
 
   useEffect(() => {
     const load = () => setBeen(readIds(keys.been) ?? new Set())
     /* eslint-disable react-hooks/set-state-in-effect */
     load()
-    setStreak(readStreak(`${fries.storageKey}_daily`))
     setReady(true)
     /* eslint-enable react-hooks/set-state-in-effect */
     window.addEventListener(SPOTS_EVENT, load)
@@ -81,6 +64,7 @@ export default function MyFries({ crowd }: Props) {
   if (!ready) return <div className="me placeholder" aria-hidden />
 
   const top = mine.slice(0, 5).map((entry) => entry.item)
+  const picks = friesTaste.comparisons + sauceTaste.comparisons
   const profile = top.length >= 3 ? fries.insights(top) : []
   const city = citiesFor(fries)[0]
   const locals = city ? localsIn(fries, city.key) : []
@@ -113,8 +97,8 @@ export default function MyFries({ crowd }: Props) {
           <small>Things ranked</small>
         </div>
         <div className="price">
-          <b className="cond">{streak.streak}</b>
-          <small>Day streak</small>
+          <b className="cond">{picks}</b>
+          <small>Picks made</small>
         </div>
         <div className="price">
           <b className="cond">{tried.length}</b>

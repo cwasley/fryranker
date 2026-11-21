@@ -7,7 +7,7 @@ export const revalidate = 600
 
 export const metadata: Metadata = {
   title: 'My Fries',
-  description: 'Your FryRanker ranking, taste profile, streak and spots to try next.',
+  description: 'Your FryRanker ranking, taste profile and spots to try next.',
   alternates: { canonical: '/me' },
   robots: { index: false, follow: true },
 }

@@ -1,12 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import DailyMatchup from '@/components/DailyMatchup'
 import JsonLd from '@/components/JsonLd'
 import MenuBoard from '@/components/MenuBoard'
 import Ranker from '@/components/Ranker'
 import { itemPath, type Category } from '@/lib/categories'
 import { absoluteUrl, site } from '@/lib/site'
-import { getDailyTallies } from '@/lib/daily-tallies'
 import { getMatchups, getStandings } from '@/lib/standings'
 import { formatCount, list, roundedCount, titleCase } from '@/lib/text'
 import { social } from '@/lib/metadata'
@@ -25,10 +23,9 @@ export async function rankerMetadata(category: Category): Promise<Metadata> {
 }
 
 export default async function RankerPage({ category }: { category: Category }) {
-  const [{ items, totalVotes }, matchups, tallies] = await Promise.all([
+  const [{ items, totalVotes }, matchups] = await Promise.all([
     getStandings(category),
     getMatchups(category),
-    getDailyTallies(category),
   ])
   const half = Math.ceil(items.length / 2)
 
@@ -37,7 +34,6 @@ export default async function RankerPage({ category }: { category: Category }) {
       <h1 className="sr-only">
         The best {category.plural}, ranked by {formatCount(totalVotes)} head-to-head votes
       </h1>
-      <DailyMatchup categoryKey={category.key} tallies={tallies} />
       <Ranker
         categoryKey={category.key}
         standings={items}
