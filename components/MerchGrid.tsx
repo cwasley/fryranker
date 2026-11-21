@@ -170,6 +170,7 @@ export default function MerchGrid({ designs, counts: initial }: Props) {
         return (
           <article key={design.id} className="merch-card">
             <div className="mockup">
+              <span className="placeholder-tag">Placeholder</span>
               <Garment design={design} />
               <Print design={design} top={top} profile={profile} />
             </div>
@@ -196,12 +197,12 @@ export default function MerchGrid({ designs, counts: initial }: Props) {
                   disabled={isWanted || busy === design.id}
                   aria-pressed={isWanted}
                 >
-                  {isWanted ? 'You want this' : busy === design.id ? 'Counting…' : 'Want this'}
+                  {isWanted ? 'Voted' : busy === design.id ? 'Counting…' : 'Want this idea'}
                 </button>
               )}
               {count >= SHOW_COUNT_FROM && (
                 <small className="merch-count">
-                  {count.toLocaleString('en-US')} people want this
+                  {count.toLocaleString('en-US')} people want this idea
                 </small>
               )}
             </div>

@@ -1,5 +1,6 @@
 /**
  * Merch designs. No chain names or logos on anything: the jokes are about fry culture, not brands.
+ * The mockups on /merch are placeholders for the ideas, not final art.
  * Until a design has a `buyUrl` (a print-on-demand store link), its button asks "Want this?" and
  * counts interest, so we know what to print first.
  */

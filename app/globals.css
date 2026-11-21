@@ -2245,8 +2245,8 @@ footer.foot a {
   position: relative;
   aspect-ratio: 15 / 16;
   padding: 18px 26px 10px;
-  background:
-    radial-gradient(circle at 50% 45%, rgb(255 191 31 / 0.35), transparent 60%), var(--paper);
+  /* Always light, so dark garments stay visible in dark mode. */
+  background: radial-gradient(circle at 50% 45%, rgb(255 191 31 / 0.45), transparent 60%), #efe3cc;
   border-bottom: var(--line) solid var(--ink);
   container-type: inline-size;
 }
@@ -2289,7 +2289,7 @@ footer.foot a {
   margin-top: 1.5cqw;
 }
 
-.print.receipt {
+.print.slip {
   top: 30%;
   width: 34%;
   padding: 2.5cqw 2cqw;
@@ -2299,7 +2299,7 @@ footer.foot a {
   transform: translateX(-50%) rotate(-2deg);
 }
 
-.print.receipt b {
+.print.slip b {
   display: block;
   font-size: 4.6cqw;
   text-align: center;
@@ -2307,15 +2307,29 @@ footer.foot a {
   padding-bottom: 1cqw;
 }
 
-.print.receipt ol {
+.print.slip ol {
   margin: 1.5cqw 0 0;
-  padding-left: 4cqw;
+  padding: 0 0 0 4cqw;
+  list-style: decimal;
   font-size: 3cqw;
   font-weight: 800;
   line-height: 1.35;
 }
 
-.print.receipt i {
+.print.slip li {
+  display: list-item;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.print.slip li::before {
+  content: none;
+}
+
+.print.slip i {
   display: block;
   height: 4cqw;
   margin-top: 1.5cqw;
@@ -2365,4 +2379,29 @@ footer.foot a {
 .merch-count {
   color: var(--soft);
   font-weight: 800;
+}
+
+.merch-note {
+  max-width: 640px;
+  margin: 0 auto 18px;
+  padding: 10px 14px;
+  border: 2px dashed var(--ink);
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.mockup .placeholder-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 2px 9px;
+  border: 2px solid #22140c;
+  border-radius: 999px;
+  background: #fffdf7;
+  color: #22140c;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }

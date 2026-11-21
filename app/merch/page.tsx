@@ -26,10 +26,14 @@ export default async function MerchPage() {
           Fry <span>merch</span>
         </h1>
         <p>
-          The shop isn&apos;t open yet. Tap what you&apos;d wear and we&apos;ll print the favorites
-          first.
+          The shop isn&apos;t open yet. Vote for the ideas you&apos;d wear and we&apos;ll make the
+          favorites first.
         </p>
       </header>
+      <p className="merch-note">
+        These are rough placeholder mockups, not the real designs. Vote on the idea; the finished
+        shirts will look a lot better.
+      </p>
       <MerchGrid designs={designs} counts={counts} />
       <p className="about">No brand logos, just strong opinions about potatoes.</p>
     </main>
