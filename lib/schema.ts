@@ -91,9 +91,15 @@ export async function setupDatabase(sql: Sql, log: (line: string) => void = cons
         place_id TEXT,
         kind TEXT NOT NULL,
         note TEXT,
-        status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'added', 'rejected')),
+        status TEXT NOT NULL DEFAULT 'pending',
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
+    `,
+    // pending → approved (someone said "add it") → added (it's in lib/data/local/), or rejected.
+    sql`ALTER TABLE spot_suggestions DROP CONSTRAINT IF EXISTS spot_suggestions_status_check`,
+    sql`
+      ALTER TABLE spot_suggestions ADD CONSTRAINT spot_suggestions_status_check
+      CHECK (status IN ('pending', 'approved', 'added', 'rejected'))
     `,
   ])
   log('Tables ready.')

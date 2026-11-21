@@ -2428,3 +2428,74 @@ footer.foot a {
     color: #69db7c;
   }
 }
+
+/* Admin review */
+.admin {
+  max-width: 760px;
+}
+
+.admin-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-login {
+  display: grid;
+  gap: 12px;
+  max-width: 320px;
+}
+
+.admin-login label {
+  display: grid;
+  gap: 6px;
+  font-weight: 800;
+}
+
+.admin-login input {
+  padding: 10px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.admin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1.5px dashed var(--soft);
+}
+
+.admin-row:last-child {
+  border-bottom: 0;
+}
+
+.admin-row p {
+  margin: 4px 0;
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.admin-row q {
+  display: block;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.admin-acts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
