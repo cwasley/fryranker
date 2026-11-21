@@ -69,6 +69,13 @@ export async function setupDatabase(sql: Sql, log: (line: string) => void = cons
       )
     `,
     sql`CREATE INDEX IF NOT EXISTS votes_category_created_at_idx ON votes (category, created_at DESC)`,
+    // "Want this?" taps on merch designs, one row per design. Anonymous: no visitor data stored.
+    sql`
+      CREATE TABLE IF NOT EXISTS merch_interest (
+        design TEXT PRIMARY KEY,
+        count INTEGER NOT NULL DEFAULT 0
+      )
+    `,
     // Spots visitors suggest for a city board. Nothing here is public until someone adds the spot
     // to `lib/data/local/` by hand; `yarn spots` lists what's waiting.
     sql`

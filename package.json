@@ -13,7 +13,9 @@
     "db:setup": "tsx --env-file=.env.local scripts/setup-db.ts",
     "db:setup:prod": "tsx --env-file=.env.local scripts/setup-db.ts --prod",
     "spots": "tsx --env-file=.env.local scripts/spots.ts",
-    "spots:prod": "tsx --env-file=.env.local scripts/spots.ts --prod"
+    "spots:prod": "tsx --env-file=.env.local scripts/spots.ts --prod",
+    "merch": "tsx --env-file=.env.local scripts/merch.ts",
+    "merch:prod": "tsx --env-file=.env.local scripts/merch.ts --prod"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

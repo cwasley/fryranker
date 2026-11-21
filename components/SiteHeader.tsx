@@ -11,6 +11,7 @@ export default function SiteHeader() {
       (c) => c.home !== '/' && (pathname.startsWith(c.base) || pathname.startsWith(`/top/${c.key}`))
     ) ?? categories.fries
   const onMine = pathname === '/me'
+  const onShop = pathname === '/merch'
   const onPick = !onMine && pathname === active.home
   const onMenu = pathname.startsWith(`${active.base}/`)
 
@@ -35,10 +36,17 @@ export default function SiteHeader() {
       </div>
       <nav className="cats" aria-label="Rankings">
         {categoryList.map((c) => (
-          <Link key={c.key} href={c.home} aria-current={c.key === active.key ? 'page' : undefined}>
+          <Link
+            key={c.key}
+            href={c.home}
+            aria-current={c.key === active.key && !onShop ? 'page' : undefined}
+          >
             {c.navLabel}
           </Link>
         ))}
+        <Link href="/merch" aria-current={onShop ? 'page' : undefined}>
+          Merch
+        </Link>
       </nav>
     </header>
   )
