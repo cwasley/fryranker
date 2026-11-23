@@ -39,7 +39,7 @@ export default function SiteHeader() {
           <Link
             key={c.key}
             href={c.home}
-            aria-current={c.key === active.key && !onShop ? 'page' : undefined}
+            aria-current={c.key === active.key && !onShop && !onMine ? 'page' : undefined}
           >
             {c.navLabel}
           </Link>
